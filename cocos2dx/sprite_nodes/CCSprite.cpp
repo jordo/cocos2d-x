@@ -267,6 +267,7 @@ bool CCSprite::initWithSpriteFrame(CCSpriteFrame *pSpriteFrame)
 
 	bool bRet = initWithTexture(pSpriteFrame->getTexture(), pSpriteFrame->getRect());
 	setDisplayFrame(pSpriteFrame);
+	setTextureRect(pSpriteFrame->getRect());
 
 	return bRet;
 }

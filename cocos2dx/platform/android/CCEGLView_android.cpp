@@ -117,7 +117,7 @@ void CCEGLView::swapBuffers()
 bool CCEGLView::canSetContentScaleFactor()
 {
     // can scale content?
-    return false;
+	return true;
 }
 
 void CCEGLView::setContentScaleFactor(float contentScaleFactor)

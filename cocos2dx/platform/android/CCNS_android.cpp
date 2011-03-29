@@ -22,13 +22,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 #include "platform/CCNS.h"
+#include <string.h>
+#include <math.h>
+#include <stdlib.h>
 
 ///@todo implement the functions
 namespace cocos2d
 {
 	CCRect CCRectFromString(const char* pszContent)
 	{
-        return CCRectZero;
+		char strtmp[256];
+		strncpy (strtmp, pszContent, sizeof(strtmp) - 1);
+
+		char *pch = strtok(strtmp," ,{}");
+		int i = 0;
+		float x,y,width,height = 0.0f;
+		while (pch != NULL)
+		{
+			switch(i) {
+			case 0:
+				x = atof(pch);
+				break;
+			case 1:
+				y = atof(pch);
+				break;
+
+			case 2:
+				width = atof(pch);
+				break;
+			case 3:
+				height = atof(pch);
+				break;
+
+			default:
+				// bad...
+				assert(0);
+				break;
+			}
+		    pch = strtok (NULL, " ,{}");
+		    ++i;
+		}
+
+        return CCRectMake(x,y,width,height);
 	}
 
 	CCPoint CCPointFromString(const char* pszContent)
