@@ -203,6 +203,9 @@ bool CCSprite::init(void)
 	// Atlas: TexCoords
 	setTextureRectInPixels(CCRectZero, false, CCSizeZero);
 
+	setScaleMode(kCCNodeScaleMin);
+	//setScale(1.0f);
+
 	return true;
 }
 

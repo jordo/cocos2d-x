@@ -42,9 +42,13 @@ THE SOFTWARE.
 
 namespace   cocos2d {
 
+static CGFloat scaleResIndMin = 1.0f;
+static CGFloat scaleResIndMax = 1.0f;
+
 CCNode::CCNode(void)
 :m_bIsRunning(false)
 ,m_fRotation(0.0f)
+,m_fScaleMode(kCCNodeScaleNone)
 ,m_fScaleX(1.0f)
 ,m_fScaleY(1.0f)
 ,m_tPosition(CCPointZero)
@@ -163,6 +167,11 @@ void CCNode::setRotation(float newRotation)
 #endif
 }
 
+CCSize CCNode::getContentSizeScaled()
+{
+	return CCSizeMake(m_tContentSize.width * m_fScaleX, m_tContentSize.height  * m_fScaleX );
+}
+
 
 /// scale getter
 float CCNode::getScale(void)
@@ -179,6 +188,44 @@ void CCNode::setScale(float scale)
 #ifdef CC_NODE_TRANSFORM_USING_AFFINE_MATRIX
 	m_bIsTransformGLDirty = true;
 #endif
+}
+
+/// scaleX getter
+CCNodeScaleMode CCNode::getScaleMode(void)
+{
+	return m_fScaleMode;
+}
+
+void CCNode::setScaleMode(CCNodeScaleMode scaleMode)
+{
+	float scale = getScale();
+	if(m_fScaleMode != kCCNodeScaleNone) {
+		if(m_fScaleMode == kCCNodeScaleMin)
+			scale = scale / scaleResIndMin;
+		else
+			scale = scale / scaleResIndMax;
+	}
+
+	if(scaleMode != kCCNodeScaleNone) {
+		if(scaleMode == kCCNodeScaleMin)
+			setScale( scale * scaleResIndMin);
+		else
+			setScale( scale * scaleResIndMax);
+	}
+	else {
+		setScale(scale);
+	}
+	m_fScaleMode = scaleMode;
+}
+
+void CCNode::setMinResIndScale(CGFloat minScale)
+{
+	scaleResIndMin = minScale;
+}
+
+void CCNode::setMaxResIndScale(CGFloat maxScale)
+{
+	scaleResIndMax = maxScale;
 }
 
 /// scaleX getter

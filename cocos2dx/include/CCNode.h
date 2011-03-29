@@ -47,6 +47,16 @@ namespace   cocos2d {
 		kCCNodeTagInvalid = -1,
 	};
 
+	/** @typedef CCNodeScaleMode
+	Possible resolution independence modes
+	*/
+	typedef enum {
+		kCCNodeScaleNone = 0,
+		kCCNodeScaleMin,
+		kCCNodeScaleMax
+
+	} CCNodeScaleMode;
+
 	/** @brief CCNode is the main element. Anything thats gets drawn or contains things that get drawn is a CCNode.
 	The most popular CCNodes are: CCScene, CCLayer, CCSprite, CCMenu.
 
@@ -129,6 +139,16 @@ namespace   cocos2d {
 			float getScale();
 		/** The scale factor of the node. 1.0 is the default scale factor. It modifies the X and Y scale at the same time. */
 		void setScale(float scale);
+
+		CC_PROPERTY(CCNodeScaleMode, m_fScaleMode, ScaleMode)
+
+		CCSize getContentSizeScaled();
+
+		/**  TODO: doc */
+		static void setMinResIndScale(CGFloat minScale);
+
+		/** TODO: doc */
+		static void setMaxResIndScale(CGFloat maxScale);
 
 		/** The scale factor of the node. 1.0 is the default scale factor. It only modifies the X scale factor. */
 		CC_PROPERTY(float, m_fScaleX, ScaleX)
