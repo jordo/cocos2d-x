@@ -27,6 +27,7 @@ THE SOFTWARE.
 
 #include <set>
 #include "CCObject.h"
+#include "CCMutableArray.h"
 
 namespace   cocos2d {
 
@@ -48,6 +49,7 @@ public:
 	CCSetIterator begin();
 	CCSetIterator end();
     CCObject* anyObject();
+    CCMutableArray<CCObject*>* allObjects();
 
 private:
     std::set<CCObject *> *m_pSet;

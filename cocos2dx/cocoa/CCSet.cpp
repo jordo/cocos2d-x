@@ -109,4 +109,20 @@ CCObject* CCSet::anyObject()
     return NULL;
 }
 
+CCMutableArray<CCObject*>* CCSet::allObjects()
+{
+	CCMutableArray<CCObject*>* objectArray = new CCMutableArray<CCObject*>(10);
+	objectArray->autorelease();
+
+	CCObject* object;
+	CCSetIterator it;
+	for( it = this->begin(); it != this->end(); it++)
+	{
+		object = (*it);
+		objectArray->addObject(object);
+	}
+
+	return objectArray;
+}
+
 }//namespace   cocos2d 
