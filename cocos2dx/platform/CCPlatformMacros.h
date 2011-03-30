@@ -121,6 +121,10 @@ public: inline void set##funName(varType var){ varName = var; }
 #define CC_SAFE_RETAIN(p)			if(p) { p->retain(); }
 #define CC_BREAK_IF(cond)			if(cond) break;
 
+#define CC_PROPERTY_SYNTH(varType, varName, funName)\
+protected: varType varName;\
+public: inline varType get##funName(void) const { return varName; }\
+public: inline void set##funName(varType var){ CC_SAFE_RETAIN(var); CC_SAFE_RELEASE(varName); varName = var; }
 
 // cocos2d debug
 #if !defined(COCOS2D_DEBUG) || COCOS2D_DEBUG == 0

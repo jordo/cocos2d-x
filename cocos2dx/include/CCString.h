@@ -40,6 +40,14 @@ namespace cocos2d {
 		{
 			m_sString = str;
 		}
+		CCString(std::string str)
+		{
+			m_sString = str;
+		}
+		CCString(CCString* str)
+		{
+			m_sString = str->m_sString;
+		}
 		virtual ~CCString(){ m_sString.clear(); }
 		int toInt()
 		{
