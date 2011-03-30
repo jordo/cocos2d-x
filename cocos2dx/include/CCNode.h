@@ -120,103 +120,106 @@ namespace   cocos2d {
 		/** The z order of the node relative to it's "brothers": children of the same parent */
 		CC_PROPERTY_READONLY(int, m_nZOrder, ZOrder)
 
-			/** The real openGL Z vertex.
-			Differences between openGL Z vertex and cocos2d Z order:
-			- OpenGL Z modifies the Z vertex, and not the Z order in the relation between parent-children
-			- OpenGL Z might require to set 2D projection
-			- cocos2d Z order works OK if all the nodes uses the same openGL Z vertex. eg: vertexZ = 0
-			@warning: Use it at your own risk since it might break the cocos2d parent-children z order
-			@since v0.8
-			*/
-			CC_PROPERTY(float, m_fVertexZ, VertexZ)
+		/** The real openGL Z vertex.
+		Differences between openGL Z vertex and cocos2d Z order:
+		- OpenGL Z modifies the Z vertex, and not the Z order in the relation between parent-children
+		- OpenGL Z might require to set 2D projection
+		- cocos2d Z order works OK if all the nodes uses the same openGL Z vertex. eg: vertexZ = 0
+		@warning: Use it at your own risk since it might break the cocos2d parent-children z order
+		@since v0.8
+		*/
+		CC_PROPERTY(float, m_fVertexZ, VertexZ)
 
-			/** The rotation (angle) of the node in degrees. 0 is the default rotation angle. Positive values rotate node CW. */
-			CC_PROPERTY(float, m_fRotation, Rotation)
+		/** The rotation (angle) of the node in degrees. 0 is the default rotation angle. Positive values rotate node CW. */
+		CC_PROPERTY(float, m_fRotation, Rotation)
 
-			/** Get the scale factor of the node.
-			@warning: Assert when m_fScaleX != m_fScaleY.
-			*/
-			float getScale();
+		/** Get the scale factor of the node.
+		@warning: Assert when m_fScaleX != m_fScaleY.
+		*/
+		float getScale();
+
 		/** The scale factor of the node. 1.0 is the default scale factor. It modifies the X and Y scale at the same time. */
 		void setScale(float scale);
 
+		/** The resolution independence scale mode of the node in degrees. Defaults to none in CCNodes. */
 		CC_PROPERTY(CCNodeScaleMode, m_fScaleMode, ScaleMode)
 
+		/** Get the content size of the node with the effected scale mode.  Use this content size if using resolution scaling. */
 		CCSize getContentSizeScaled();
 
-		/**  TODO: doc */
+		/**  Sets the minimun (smallest supported scale factor) resolution scale factor. */
 		static void setMinResIndScale(CGFloat minScale);
 
-		/** TODO: doc */
+		/** Sets the maximum (largest supported scale factor) resolution scale factor. */
 		static void setMaxResIndScale(CGFloat maxScale);
 
 		/** The scale factor of the node. 1.0 is the default scale factor. It only modifies the X scale factor. */
 		CC_PROPERTY(float, m_fScaleX, ScaleX)
 
-			/** The scale factor of the node. 1.0 is the default scale factor. It only modifies the Y scale factor. */
-			CC_PROPERTY(float, m_fScaleY, ScaleY)
+		/** The scale factor of the node. 1.0 is the default scale factor. It only modifies the Y scale factor. */
+		CC_PROPERTY(float, m_fScaleY, ScaleY)
 
-			/** Position (x,y) of the node in OpenGL coordinates. (0,0) is the left-bottom corner. */
-			CC_PROPERTY(CCPoint, m_tPosition, Position)
-			CC_PROPERTY(CCPoint, m_tPositionInPixels, PositionInPixels)
+		/** Position (x,y) of the node in OpenGL coordinates. (0,0) is the left-bottom corner. */
+		CC_PROPERTY(CCPoint, m_tPosition, Position)
+		CC_PROPERTY(CCPoint, m_tPositionInPixels, PositionInPixels)
 
-			CC_PROPERTY_READONLY(CCMutableArray<CCNode *> *, m_pChildren, Children)
+		CC_PROPERTY_READONLY(CCMutableArray<CCNode *> *, m_pChildren, Children)
 
-			/** A CCCamera object that lets you move the node using a gluLookAt
-			*/
-			CC_PROPERTY_READONLY(CCCamera *, m_pCamera, Camera)
+		/** A CCCamera object that lets you move the node using a gluLookAt
+		*/
+		CC_PROPERTY_READONLY(CCCamera *, m_pCamera, Camera)
 
-			/** A CCGrid object that is used when applying effects */
-			CC_PROPERTY(CCGridBase *, m_pGrid, Grid)
+		/** A CCGrid object that is used when applying effects */
+		CC_PROPERTY(CCGridBase *, m_pGrid, Grid)
 
-			/** Whether of not the node is visible. Default is true */
-			CC_PROPERTY(bool, m_bIsVisible, IsVisible)
+		/** Whether of not the node is visible. Default is true */
+		CC_PROPERTY(bool, m_bIsVisible, IsVisible)
 
-			/** anchorPoint is the point around which all transformations and positioning manipulations take place.
-			It's like a pin in the node where it is "attached" to its parent.
-			The anchorPoint is normalized, like a percentage. (0,0) means the bottom-left corner and (1,1) means the top-right corner.
-			But you can use values higher than (1,1) and lower than (0,0) too.
-			The default anchorPoint is (0.5,0.5), so it starts in the center of the node.
-			@since v0.8
-			*/
-			CC_PROPERTY(CCPoint, m_tAnchorPoint, AnchorPoint)
+		/** anchorPoint is the point around which all transformations and positioning manipulations take place.
+		It's like a pin in the node where it is "attached" to its parent.
+		The anchorPoint is normalized, like a percentage. (0,0) means the bottom-left corner and (1,1) means the top-right corner.
+		But you can use values higher than (1,1) and lower than (0,0) too.
+		The default anchorPoint is (0.5,0.5), so it starts in the center of the node.
+		@since v0.8
+		*/
+		CC_PROPERTY(CCPoint, m_tAnchorPoint, AnchorPoint)
 
-			/** The anchorPoint in absolute pixels.
-			Since v0.8 you can only read it. If you wish to modify it, use anchorPoint instead
-			*/
-			CC_PROPERTY_READONLY(CCPoint, m_tAnchorPointInPixels, AnchorPointInPixels)
+		/** The anchorPoint in absolute pixels.
+		Since v0.8 you can only read it. If you wish to modify it, use anchorPoint instead
+		*/
+		CC_PROPERTY_READONLY(CCPoint, m_tAnchorPointInPixels, AnchorPointInPixels)
 
-			/** The untransformed size of the node.
-			The contentSize remains the same no matter the node is scaled or rotated.
-			All nodes has a size. Layer and Scene has the same size of the screen.
-			@since v0.8
-			*/
-			CC_PROPERTY(CCSize, m_tContentSize, ContentSize)
+		/** The untransformed size of the node.
+		The contentSize remains the same no matter the node is scaled or rotated.
+		All nodes has a size. Layer and Scene has the same size of the screen.
+		@since v0.8
+		*/
+		CC_PROPERTY(CCSize, m_tContentSize, ContentSize)
 
-			/** The untransformed size of the node in Pixels
-			The contentSize remains the same no matter the node is scaled or rotated.
-			All nodes has a size. Layer and Scene has the same size of the screen.
-			@since v0.8
-			*/
-			CC_PROPERTY(CCSize, m_tContentSizeInPixels, ContentSizeInPixels)
+		/** The untransformed size of the node in Pixels
+		The contentSize remains the same no matter the node is scaled or rotated.
+		All nodes has a size. Layer and Scene has the same size of the screen.
+		@since v0.8
+		*/
+		CC_PROPERTY(CCSize, m_tContentSizeInPixels, ContentSizeInPixels)
 
-			/** whether or not the node is running */
-			CC_PROPERTY_READONLY(bool, m_bIsRunning, IsRunning)
+		/** whether or not the node is running */
+		CC_PROPERTY_READONLY(bool, m_bIsRunning, IsRunning)
 
-			/** A weak reference to the parent */
-			CC_PROPERTY(CCNode *, m_pParent, Parent)
+		/** A weak reference to the parent */
+		CC_PROPERTY(CCNode *, m_pParent, Parent)
 
-			/** If true the transformtions will be relative to it's anchor point.
-			* Sprites, Labels and any other sizeble object use it have it enabled by default.
-			* Scenes, Layers and other "whole screen" object don't use it, have it disabled by default.
-			*/
-			CC_PROPERTY(bool, m_bIsRelativeAnchorPoint, IsRelativeAnchorPoint)
+		/** If true the transformtions will be relative to it's anchor point.
+		* Sprites, Labels and any other sizeble object use it have it enabled by default.
+		* Scenes, Layers and other "whole screen" object don't use it, have it disabled by default.
+		*/
+		CC_PROPERTY(bool, m_bIsRelativeAnchorPoint, IsRelativeAnchorPoint)
 
-			/** A tag used to identify the node easily */
-			CC_PROPERTY(int, m_nTag, Tag)
+		/** A tag used to identify the node easily */
+		CC_PROPERTY(int, m_nTag, Tag)
 
-			/** A custom user data pointer */
-			CC_PROPERTY(void *, m_pUserData, UserData)
+		/** A custom user data pointer */
+		CC_PROPERTY(void *, m_pUserData, UserData)
 
 	protected:
 
