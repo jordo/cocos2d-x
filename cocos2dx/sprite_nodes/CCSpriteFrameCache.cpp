@@ -155,18 +155,26 @@ void CCSpriteFrameCache::addSpriteFramesWithDictionary(CCDictionary<std::string,
 		} else
 		if (format == 3)
 		{
-			/// @todo what's the format look like?
-			assert(false);
-			return;
-			/*
 			// get values
 			CCSize spriteSize = CCSizeFromString(valueForKey("spriteSize", frameDict));
+			CCPoint offset = CCPointFromString(valueForKey("spriteOffset", frameDict));
 			CCPoint spriteOffset = CCPointFromString(valueForKey("spriteOffset", frameDict));
 			CCSize spriteSourceSize = CCSizeFromString(valueForKey("spriteSourceSize", frameDict));
 			CCRect textureRect = CCRectFromString(valueForKey("textureRect", frameDict));
 			bool textureRotated = atoi(valueForKey("textureRotated", frameDict)) == 0;
 
+			// create frame
+			spriteFrame = new CCSpriteFrame();
+			spriteFrame->initWithTexture(pobTexture,
+				textureRect,
+				textureRotated,
+				offset,
+				spriteSourceSize
+				);
+
 			// get aliases
+			// todo: omitting aliases right now, I dont care about aliases...
+			/*
 			CCMutableArray<CCString*> *aliases = CCMutableArray<CCString*>dictionary->objectForKey(std::string("aliases"));
 
 			while( alias = (CCDictionary<std::string, CCObject*>*)aliases->next(&key) )
@@ -178,8 +186,8 @@ void CCSpriteFrameCache::addSpriteFramesWithDictionary(CCDictionary<std::string,
 				}
 
 				m_pSpriteFramesAliases->setObject(frameDict, value);
-			}
-			*/
+			}*/
+
 		}
 
 		// add sprite frame
