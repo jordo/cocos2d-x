@@ -114,11 +114,14 @@ static voidpf ZCALLBACK fopen64_file_func (voidpf opaque, const void* filename, 
         mode_fopen = "wb";
 
     if ((filename!=NULL) && (mode_fopen != NULL))
+    {
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_AIRPLAY)
 		file = NULL;
 #else
-	file = fopen64((const char*)filename, mode_fopen);	
+	    file = fopen64((const char*)filename, mode_fopen);	
 #endif
+    }
+
     return file;
 }
 

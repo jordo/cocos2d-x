@@ -1,6 +1,7 @@
 /****************************************************************************
- Copyright (c) 2011      cocos2d-x.org   http://cocos2d-x.org
- Copyright (c) 2011      Максим Аксенов
+ Copyright (c) 2010 cocos2d-x.org
+ 
+ http://www.cocos2d-x.org
  
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -21,22 +22,40 @@
  THE SOFTWARE.
  ****************************************************************************/
 
-#include "platform/CCNS.h"
+#include "CCCommon.h"
 
-///@todo implement the functions
+#include <stdarg.h>
+#include <stdio.h>
+
+#import <UIKit/UIAlert.h>
+
 NS_CC_BEGIN;
-	CCRect CCRectFromString(const char* pszContent)
-	{
-        return CCRectZero;
-	}
 
-	CCPoint CCPointFromString(const char* pszContent)
-	{
-        return CCPointZero;
-	}
+void CCLog(const char * pszFormat, ...)
+{
+    printf("Cocos2d: ");
+    char szBuf[kMaxLogLen];
+    
+    va_list ap;
+    va_start(ap, pszFormat);
+    vsprintf(szBuf, pszFormat, ap);
+    va_end(ap);
+    printf("%s", szBuf);
+    printf("\n");
+}
 
-	CCSize CCSizeFromString(const char* pszContent)
-	{
-        return CCSizeZero;
-	}
+// ios no MessageBox, use CCLog instead
+void CCMessageBox(const char * pszMsg, const char * pszTitle)
+{
+    NSString * title = (pszTitle) ? [NSString stringWithUTF8String : pszTitle] : nil;
+    NSString * msg = (pszMsg) ? [NSString stringWithUTF8String : pszMsg] : nil;
+    UIAlertView * messageBox = [[UIAlertView alloc] initWithTitle: title
+                                                          message: msg
+                                                         delegate: nil
+                                                cancelButtonTitle: @"OK"
+                                                otherButtonTitles: nil];
+    [messageBox autorelease];
+    [messageBox show];
+}
+
 NS_CC_END;

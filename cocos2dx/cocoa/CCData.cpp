@@ -24,7 +24,7 @@ THE SOFTWARE.
 
 
 #include "CCData.h"
-#include "support/file_support/FileData.h"
+#include "CCFileUtils.h"
 
 #include <stdio.h>
 
@@ -32,23 +32,20 @@ using namespace std;
 namespace   cocos2d {
 
 CCData::CCData(void)
+: m_pData(NULL)
 {
-	m_pData = NULL;
 }
 
 CCData::~CCData(void)
 {
-	if (m_pData)
-	{
-		delete[] m_pData;
-	}
+	CC_SAFE_DELETE_ARRAY(m_pData);
 }
 
 CCData* CCData::dataWithContentsOfFile(const string &strPath)
 {
-    FileData data;
-    unsigned long  nSize = 0;
-    unsigned char* pBuffer = data.getFileData(strPath.c_str(), "rb", &nSize);
+    CCFileData data(strPath.c_str(), "rb");
+    unsigned long  nSize = data.getSize();
+    unsigned char* pBuffer = data.getBuffer();
 
     if (! pBuffer)
     {

@@ -25,7 +25,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 
-#include "platform/CCNS.h"
+#include "cocoa/CCNS.h"
 #include "ccMacros.h"
 #include "CCTextureCache.h"
 #include "CCSpriteFrameCache.h"
@@ -58,14 +58,14 @@ void CCSpriteFrameCache::purgeSharedSpriteFrameCache(void)
 bool CCSpriteFrameCache::init(void)
 {
 	m_pSpriteFrames= new CCDictionary<std::string, CCSpriteFrame*>();
-	m_pSpriteFramesAliases = new CCDictionary<std::string, CCSpriteFrame*>();
+	m_pSpriteFramesAliases = new CCDictionary<std::string, CCString*>();
 	return true;
 }
 
 CCSpriteFrameCache::~CCSpriteFrameCache(void)
 {
-	m_pSpriteFrames->release();
-	m_pSpriteFramesAliases->release();
+	CC_SAFE_RELEASE(m_pSpriteFrames);
+	CC_SAFE_RELEASE(m_pSpriteFramesAliases);
 }
 
 void CCSpriteFrameCache::addSpriteFramesWithDictionary(CCDictionary<std::string, CCObject*> *dictionary, CCTexture2D *pobTexture)
@@ -157,37 +157,34 @@ void CCSpriteFrameCache::addSpriteFramesWithDictionary(CCDictionary<std::string,
 		{
 			// get values
 			CCSize spriteSize = CCSizeFromString(valueForKey("spriteSize", frameDict));
-			CCPoint offset = CCPointFromString(valueForKey("spriteOffset", frameDict));
 			CCPoint spriteOffset = CCPointFromString(valueForKey("spriteOffset", frameDict));
 			CCSize spriteSourceSize = CCSizeFromString(valueForKey("spriteSourceSize", frameDict));
 			CCRect textureRect = CCRectFromString(valueForKey("textureRect", frameDict));
-			bool textureRotated = atoi(valueForKey("textureRotated", frameDict)) == 0;
-
-			// create frame
-			spriteFrame = new CCSpriteFrame();
-			spriteFrame->initWithTexture(pobTexture,
-				textureRect,
-				textureRotated,
-				offset,
-				spriteSourceSize
-				);
+            bool textureRotated = atoi(valueForKey("textureRotated", frameDict)) == 0 ? false : true;
 
 			// get aliases
-			// todo: omitting aliases right now, I dont care about aliases...
-			/*
-			CCMutableArray<CCString*> *aliases = CCMutableArray<CCString*>dictionary->objectForKey(std::string("aliases"));
+			CCMutableArray<CCString*> *aliases = (CCMutableArray<CCString*> *) (frameDict->objectForKey(std::string("aliases")));
+            CCMutableArray<CCString*>::CCMutableArrayIterator iter;
 
-			while( alias = (CCDictionary<std::string, CCObject*>*)aliases->next(&key) )
-			{
-				std::string value = ((CCString*)alias->objectForKey(key))->m_sString();
-				if (m_pSpriteFramesAliases->objectForKey(value))
-				{
-					CCLOG("cocos2d: WARNING: an alias with name %s already exists", value.c_str());
-				}
+            CCString * frameKey = new CCString(key.c_str());
+            for (iter = aliases->begin(); iter != aliases->end(); iter++)
+            {
+                std::string oneAlias = ((CCString*) (*iter))->m_sString;
+                if (m_pSpriteFramesAliases->objectForKey(oneAlias))
+                {
+                    CCLOG("cocos2d: WARNING: an alias with name %s already exists", oneAlias.c_str());
+                }
 
-				m_pSpriteFramesAliases->setObject(frameDict, value);
-			}*/
-
+                m_pSpriteFramesAliases->setObject(frameKey, oneAlias);
+            }
+            frameKey->release();
+            // create frame
+            spriteFrame = new CCSpriteFrame();
+            spriteFrame->initWithTexture(pobTexture,
+                            CCRectMake(textureRect.origin.x, textureRect.origin.y, spriteSize.width, spriteSize.height),
+                            textureRotated,
+                            spriteOffset,
+                            spriteSourceSize);
 		}
 
 		// add sprite frame

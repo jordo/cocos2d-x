@@ -131,12 +131,12 @@ public:
 	static void purgeSharedSpriteFrameCache(void);
 
 private:
-	CCSpriteFrameCache(void) {}
+	CCSpriteFrameCache(void) : m_pSpriteFrames(NULL), m_pSpriteFramesAliases(NULL){}
 	const char * valueForKey(const char *key, CCDictionary<std::string, CCObject*> *dict);
 	
 protected:
 	CCDictionary<std::string, CCSpriteFrame*> *m_pSpriteFrames;
-	CCDictionary<std::string, CCSpriteFrame*> *m_pSpriteFramesAliases;
+	CCDictionary<std::string, CCString*> *m_pSpriteFramesAliases;
 };
 }//namespace   cocos2d 
 

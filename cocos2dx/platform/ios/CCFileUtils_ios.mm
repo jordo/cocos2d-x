@@ -29,92 +29,92 @@ THE SOFTWARE.
 #include <libxml/tree.h>
 #include <libxml/xmlmemory.h>
 #include "CCString.h"
-#include "CCFileUtils_ios.h"
+#include "CCFileUtils.h"
 #include "CCDirector.h"
-#include <string>
+#include "CCSAXParser.h"
 
 #define MAX_PATH 260
 
 static const char *static_ccRemoveHDSuffixFromFile( const char *pszPath)
 {
 #if CC_IS_RETINA_DISPLAY_SUPPORTED
-    
-        if(cocos2d::CC_CONTENT_SCALE_FACTOR() == 2 ) {
-                NSString *path = [NSString stringWithUTF8String: pszPath];
-                NSString *name = [path lastPathComponent];
-                NSString *suffix = [NSString stringWithUTF8String: CC_RETINA_DISPLAY_FILENAME_SUFFIX];
-                
-                        // check if path already has the suffix.
-                if( [name rangeOfString: suffix].location != NSNotFound ) {
-			
-                        CCLOG("cocos2d: Filename(%@) contains %@ suffix. Removing it. See cocos2d issue #1040", path, CC_RETINA_DISPLAY_FILENAME_SUFFIX);
-            
-                        NSString *newLastname = [name stringByReplacingOccurrencesOfString: suffix withString:@""];
-			
-                        NSString *pathWithoutLastname = [path stringByDeletingLastPathComponent];
-                        return [[pathWithoutLastname stringByAppendingPathComponent:newLastname] UTF8String];
-                }		
-        }
-    
+
+    if(cocos2d::CC_CONTENT_SCALE_FACTOR() == 2 ) {
+        NSString *path = [NSString stringWithUTF8String: pszPath];
+        NSString *name = [path lastPathComponent];
+        NSString *suffix = [NSString stringWithUTF8String: CC_RETINA_DISPLAY_FILENAME_SUFFIX];
+
+        // check if path already has the suffix.
+        if( [name rangeOfString: suffix].location != NSNotFound ) {
+
+            CCLOG("cocos2d: Filename(%@) contains %@ suffix. Removing it. See cocos2d issue #1040", path, CC_RETINA_DISPLAY_FILENAME_SUFFIX);
+
+            NSString *newLastname = [name stringByReplacingOccurrencesOfString: suffix withString:@""];
+
+            NSString *pathWithoutLastname = [path stringByDeletingLastPathComponent];
+            return [[pathWithoutLastname stringByAppendingPathComponent:newLastname] UTF8String];
+        }		
+    }
+
 #endif // CC_IS_RETINA_DISPLAY_SUPPORTED
-    
-        return pszPath;
+
+    return pszPath;
 }
 
 static NSString* getDoubleResolutionImage(NSString* path)
 {
 #if CC_IS_RETINA_DISPLAY_SUPPORTED
-    
-	if( cocos2d::CC_CONTENT_SCALE_FACTOR() == 2 )
-	{
-		
-		NSString *pathWithoutExtension = [path stringByDeletingPathExtension];
-		NSString *name = [pathWithoutExtension lastPathComponent];
-		NSString *suffix = [NSString stringWithUTF8String: CC_RETINA_DISPLAY_FILENAME_SUFFIX];
-                
-		// check if path already has the suffix.
-		if( [name rangeOfString: suffix].location != NSNotFound ) {
-            
-			CCLOG("cocos2d: WARNING Filename(%@) already has the suffix %@. Using it.", name, CC_RETINA_DISPLAY_FILENAME_SUFFIX);			
-			return path;
-		}
-        
-		
-		NSString *extension = [path pathExtension];
-		
-		if( [extension isEqualToString:@"ccz"] || [extension isEqualToString:@"gz"] )
-		{
-			// All ccz / gz files should be in the format filename.xxx.ccz
-			// so we need to pull off the .xxx part of the extension as well
-			extension = [NSString stringWithFormat:@"%@.%@", [pathWithoutExtension pathExtension], extension];
-			pathWithoutExtension = [pathWithoutExtension stringByDeletingPathExtension];
-		}
-		
-		
-		NSString *retinaName = [pathWithoutExtension stringByAppendingString: suffix];
-		retinaName = [retinaName stringByAppendingPathExtension:extension];
-        
-                NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
-		if( [fileManager fileExistsAtPath:retinaName] )
-			return retinaName;
-        
-		CCLOG("cocos2d: CCFileUtils: Warning HD file not found: %@", [retinaName lastPathComponent] );
-	}
-	
+
+    if( cocos2d::CC_CONTENT_SCALE_FACTOR() == 2 )
+    {
+
+        NSString *pathWithoutExtension = [path stringByDeletingPathExtension];
+        NSString *name = [pathWithoutExtension lastPathComponent];
+        NSString *suffix = [NSString stringWithUTF8String: CC_RETINA_DISPLAY_FILENAME_SUFFIX];
+
+        // check if path already has the suffix.
+        if( [name rangeOfString: suffix].location != NSNotFound ) {
+
+            CCLOG("cocos2d: WARNING Filename(%@) already has the suffix %@. Using it.", name, CC_RETINA_DISPLAY_FILENAME_SUFFIX);			
+            return path;
+        }
+
+
+        NSString *extension = [path pathExtension];
+
+        if( [extension isEqualToString:@"ccz"] || [extension isEqualToString:@"gz"] )
+        {
+            // All ccz / gz files should be in the format filename.xxx.ccz
+            // so we need to pull off the .xxx part of the extension as well
+            extension = [NSString stringWithFormat:@"%@.%@", [pathWithoutExtension pathExtension], extension];
+            pathWithoutExtension = [pathWithoutExtension stringByDeletingPathExtension];
+        }
+
+
+        NSString *retinaName = [pathWithoutExtension stringByAppendingString: suffix];
+        retinaName = [retinaName stringByAppendingPathExtension:extension];
+
+        NSFileManager *fileManager = [[[NSFileManager alloc] init] autorelease];
+        if( [fileManager fileExistsAtPath:retinaName] )
+            return retinaName;
+
+        CCLOG("cocos2d: CCFileUtils: Warning HD file not found: %@", [retinaName lastPathComponent] );
+    }
+
 #endif // CC_IS_RETINA_DISPLAY_SUPPORTED
-	
-	return path;
+
+    return path;
 }
 
 static const char* static_fullPathFromRelativePath(const char *pszRelativePath)
 
 {
-    
-                // NSAssert(pszRelativePath != nil, @"CCFileUtils: Invalid path");
-    
-        // do not convert an absolute path (starting with '/')
-	NSString *relPath = [NSString stringWithUTF8String: pszRelativePath];
-	NSString *fullpath = nil;
+
+    // NSAssert(pszRelativePath != nil, @"CCFileUtils: Invalid path");
+
+    // do not convert an absolute path (starting with '/')
+    NSString *relPath = [NSString stringWithUTF8String: pszRelativePath];
+    NSString *fullpath = nil;
 	
 	// only if it is not an absolute path
 	if( ! [relPath isAbsolutePath] )
@@ -136,178 +136,198 @@ static const char* static_fullPathFromRelativePath(const char *pszRelativePath)
 }
 
 namespace cocos2d {
-    void plist_startElement(void *ctx, const xmlChar *name, const xmlChar **atts);
-    void plist_endElement(void *ctx, const xmlChar *name);
-    void plist_characters(void *ctx, const xmlChar *ch, int len);
-    
-    typedef enum 
+
+typedef enum 
+{
+    SAX_NONE = 0,
+    SAX_KEY,
+    SAX_DICT,
+    SAX_INT,
+    SAX_REAL,
+    SAX_STRING
+}CCSAXState;
+
+class CCDictMaker : public CCSAXDelegator
+{
+public:
+    CCDictionary<std::string, CCObject*> *m_pRootDict;
+    CCDictionary<std::string, CCObject*> *m_pCurDict;
+    std::stack<CCDictionary<std::string, CCObject*>*> m_tDictStack;
+    std::string m_sCurKey;///< parsed key
+    CCSAXState m_tState;
+    bool    m_bInArray;
+    CCMutableArray<CCObject*> *m_pArray;
+
+public:
+    CCDictMaker()
     {
-        SAX_NONE = 0,
-        SAX_KEY,
-        SAX_DICT,
-        SAX_INT,
-        SAX_REAL,
-        SAX_STRING
-    }CCSAXState;
-    
-    class CCDictMaker
+        m_pRootDict = NULL;
+        m_pCurDict = NULL;
+        m_tState = SAX_NONE;
+
+        m_pArray = NULL;
+        m_bInArray = false;
+    }
+    ~CCDictMaker()
     {
-    public:
-        CCDictionary<std::string, CCObject*> *m_pRootDict;
-        CCDictionary<std::string, CCObject*> *m_pCurDict;
-        std::stack<CCDictionary<std::string, CCObject*>*> m_tDictStack;
-        std::string m_sCurKey;///< parsed key
-        CCSAXState m_tState;
-    public:
-        CCDictMaker()
-        {
-            m_pRootDict = NULL;
-            m_pCurDict = NULL;
-            m_tState = SAX_NONE;
-        }
-        ~CCDictMaker()
-        {
-        }
-        CCDictionary<std::string, CCObject*> *dictionaryWithContentsOfFile(const char *pFileName)
-        {
-            FILE *fp = NULL;
-            if( !(fp = fopen(pFileName, "r")) )
-            {
-                return NULL;
-            }
-            fseek(fp,0,SEEK_END);
-            int size = ftell(fp);
-            fseek(fp,0,SEEK_SET);
-            char *buffer = new char[size+1];
-            fread(buffer,sizeof(char),size,fp);
-            fclose(fp);
-            /*
-             * this initialize the library and check potential ABI mismatches
-             * between the version it was compiled for and the actual shared
-             * library used.
-             */
-            LIBXML_TEST_VERSION
-            xmlSAXHandler saxHandler;
-            memset( &saxHandler, 0, sizeof(saxHandler) );
-            // Using xmlSAXVersion( &saxHandler, 2 ) generate crash as it sets plenty of other pointers...
-            saxHandler.initialized = XML_SAX2_MAGIC;  // so we do this to force parsing as SAX2.
-            saxHandler.startElement = &plist_startElement;
-            saxHandler.endElement = &plist_endElement;
-            saxHandler.characters = &plist_characters;
-            
-            int result = xmlSAXUserParseMemory( &saxHandler, this, buffer, size );
-            if ( result != 0 )
-            {
-                return NULL;
-            }
-            /*
-             * Cleanup function for the XML library.
-             */
-            xmlCleanupParser();
-            /*
-             * this is to debug memory for regression tests
-             */
-            xmlMemoryDump();
-            delete []buffer;
-            return m_pRootDict;
-        }
-    };
-    void plist_startElement(void *ctx, const xmlChar *name, const xmlChar **atts)
+    }
+    CCDictionary<std::string, CCObject*> *dictionaryWithContentsOfFile(const char *pFileName)
     {
-        CCDictMaker *pMaker = (CCDictMaker*)(ctx);
+        CCSAXParser parser;
+
+        if (false == parser.init("UTF-8"))
+        {
+            return NULL;
+        }
+        parser.setDelegator(this);
+
+        parser.parse(pFileName);
+        return m_pRootDict;
+    }
+
+    void startElement(void *ctx, const char *name, const char **atts)
+    {
         std::string sName((char*)name);
         if( sName == "dict" )
         {
             CCDictionary<std::string, CCObject*> *pNewDict = new CCDictionary<std::string, CCObject*>();
-            if(! pMaker->m_pRootDict)
+            if(! m_pRootDict)
             {
-                pMaker->m_pRootDict = pNewDict;
+                m_pRootDict = pNewDict;
                 pNewDict->autorelease();
             }
             else
             {
-                            // NSAssert(pMaker->m_pCurDict && !pMaker->m_sCurKey.empty(), "");
-                pMaker->m_pCurDict->setObject(pNewDict, pMaker->m_sCurKey);
+                CCAssert(m_pCurDict && !m_sCurKey.empty(), "");
+                m_pCurDict->setObject(pNewDict, m_sCurKey);
                 pNewDict->release();
-                pMaker->m_sCurKey.clear();
+                m_sCurKey.clear();
             }
-            pMaker->m_pCurDict = pNewDict;
-            pMaker->m_tDictStack.push(pMaker->m_pCurDict);
-            pMaker->m_tState = SAX_DICT;
+            m_pCurDict = pNewDict;
+            m_tDictStack.push(m_pCurDict);
+            m_tState = SAX_DICT;
         }
         else if(sName == "key")
         {
-            pMaker->m_tState = SAX_KEY;
+            m_tState = SAX_KEY;
         }
         else if(sName == "integer")
         {
-            pMaker->m_tState = SAX_INT;
+            m_tState = SAX_INT;
         }
         else if(sName == "real")
         {
-            pMaker->m_tState = SAX_REAL;
+            m_tState = SAX_REAL;
         }
         else if(sName == "string")
         {
-            pMaker->m_tState = SAX_STRING;
+            m_tState = SAX_STRING;
         }
         else
         {
-            pMaker->m_tState = SAX_NONE;
+            if (sName == "array")
+            {
+                m_bInArray = true;
+                m_pArray = new CCMutableArray<CCObject*>();
+            }
+            m_tState = SAX_NONE;
         }
     }
-    void plist_endElement(void *ctx, const xmlChar *name)
+
+    void endElement(void *ctx, const char *name)
     {
-        CCDictMaker * pMaker = (CCDictMaker*)(ctx);
         std::string sName((char*)name);
         if( sName == "dict" )
         {
-            pMaker->m_tDictStack.pop();
-            if ( !pMaker->m_tDictStack.empty() )
+            m_tDictStack.pop();
+            if ( !m_tDictStack.empty() )
             {
-                pMaker->m_pCurDict = (CCDictionary<std::string, CCObject*>*)(pMaker->m_tDictStack.top());
+                m_pCurDict = (CCDictionary<std::string, CCObject*>*)(m_tDictStack.top());
             }
         }
-        pMaker->m_tState = SAX_NONE;
+        else if (sName == "array")
+        {
+            CCAssert(m_bInArray, "The plist file is wrong!");
+            m_pCurDict->setObject(m_pArray, m_sCurKey);
+            m_pArray->release();
+            m_pArray = NULL;
+            m_bInArray = false;
+        }
+        else if (sName == "true")
+        {
+            CCString *str = new CCString("1");
+            if (m_bInArray)
+            {
+                m_pArray->addObject(str);
+            }
+            else
+            {
+                m_pCurDict->setObject(str, m_sCurKey);
+            }
+            str->release();
+        }
+        else if (sName == "false")
+        {
+            CCString *str = new CCString("0");
+            if (m_bInArray)
+            {
+                m_pArray->addObject(str);
+            }
+            else
+            {
+                m_pCurDict->setObject(str, m_sCurKey);
+            }
+            str->release();
+        }
+        m_tState = SAX_NONE;
     }
-    void plist_characters(void *ctx, const xmlChar *ch, int len)
+
+    void textHandler(void *ctx, const char *ch, int len)
     {
-        CCDictMaker * pMaker = (CCDictMaker*)(ctx);
-        if (pMaker->m_tState == SAX_NONE)
+        if (m_tState == SAX_NONE)
         {
             return;
         }
         CCString *pText = new CCString();
         pText->m_sString = std::string((char*)ch,0,len);
-        
-        switch(pMaker->m_tState)
+
+        switch(m_tState)
         {
-            case SAX_KEY:
-                pMaker->m_sCurKey = pText->m_sString;
-                break;
-            case SAX_INT:
-            case SAX_REAL:
-            case SAX_STRING:
+        case SAX_KEY:
+            m_sCurKey = pText->m_sString;
+            break;
+        case SAX_INT:
+        case SAX_REAL:
+        case SAX_STRING:
             {
-                            // NSAssert(!pMaker->m_sCurKey.empty(), "not found key : <integet/real>");
-                pMaker->m_pCurDict->setObject(pText, pMaker->m_sCurKey);
+                CCAssert(!m_sCurKey.empty(), "not found key : <integet/real>");
+
+                if (m_bInArray)
+                {
+                    m_pArray->addObject(pText);
+                }
+                else
+                {
+                    m_pCurDict->setObject(pText, m_sCurKey);
+                }
                 break;
             }
         }
         pText->release();
     }
+};
     
     // record the resource path
     static char s_pszResourcePath[MAX_PATH] = {0};
-    
+
     void CCFileUtils::setResourcePath(const char *pszResourcePath)
     {
-                    // NSAssert(pszResourcePath != NULL, "[FileUtils setResourcePath] -- wrong resource path");
-                    // NSAssert(strlen(pszResourcePath) <= MAX_PATH, "[FileUtils setResourcePath] -- resource path too long");
-        
+        // NSAssert(pszResourcePath != NULL, "[FileUtils setResourcePath] -- wrong resource path");
+        // NSAssert(strlen(pszResourcePath) <= MAX_PATH, "[FileUtils setResourcePath] -- resource path too long");
+
         strcpy(s_pszResourcePath, pszResourcePath);
     }
-    
+
     const char* CCFileUtils::getResourcePath()
     {
         return s_pszResourcePath;
@@ -317,18 +337,18 @@ namespace cocos2d {
     {
         assert( out );
         assert( &*out );
-        
+
         int size = 0;
         FILE *f = fopen(filename, "rb");
         if( !f ) { 
             *out = NULL;
             return -1;
         } 
-        
+
         fseek(f, 0, SEEK_END);
         size = ftell(f);
         fseek(f, 0, SEEK_SET);
-        
+
         *out = (unsigned char*)malloc(size);
         int read = fread(*out, 1, size, f);
         if( read != size ) { 
@@ -336,23 +356,23 @@ namespace cocos2d {
             *out = NULL;
             return -1;
         }
-        
+
         fclose(f);
-        
+
         return size;
     }
-    
+
     std::string& CCFileUtils::ccRemoveHDSuffixFromFile(std::string& path )
     {
         path = static_ccRemoveHDSuffixFromFile(path.c_str());
         return path;
     }
-    
+
     const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath)
     {
         return static_fullPathFromRelativePath(pszRelativePath);
     }
-    
+
     const char *CCFileUtils::fullPathFromRelativeFile(const char *pszFilename, const char *pszRelativeFile)
     {
         std::string relativeFile = fullPathFromRelativePath(pszRelativeFile);
@@ -366,5 +386,56 @@ namespace cocos2d {
     {
         CCDictMaker tMaker;
         return tMaker.dictionaryWithContentsOfFile(pFileName);
-    }	
-}//namespace   cocos2d 
+    }
+    unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* pszMode, unsigned long * pSize)
+    {
+        unsigned char * pBuffer = NULL;
+
+        do 
+        {
+            // read the file from hardware
+            FILE *fp = fopen(pszFileName, pszMode);
+            CC_BREAK_IF(!fp);
+
+            fseek(fp,0,SEEK_END);
+            *pSize = ftell(fp);
+            fseek(fp,0,SEEK_SET);
+            pBuffer = new unsigned char[*pSize];
+            *pSize = fread(pBuffer,sizeof(unsigned char), *pSize,fp);
+            fclose(fp);
+        } while (0);
+
+        if (! pBuffer && getIsPopupNotify()) 
+        {
+            std::string title = "Notification";
+            std::string msg = "Get data from file(";
+            msg.append(pszFileName).append(") failed!");
+
+            CCMessageBox(msg.c_str(), title.c_str());
+        }
+        return pBuffer;
+    }
+    void CCFileUtils::setResource(const char* pszZipFileName, const char* pszResPath)
+    {
+        CCAssert(0, "Have not implement!");
+    }
+    void CCFileUtils::setRelativePath(const char* pszRelativePath)
+    {
+        CCAssert(0, "Have not implement!");
+    }
+
+    // notification support when getFileData from a invalid file
+    static bool s_bPopupNotify = true;
+
+    void CCFileUtils::setIsPopupNotify(bool bNotify)
+    {
+        s_bPopupNotify = bNotify;
+    }
+
+    bool CCFileUtils::getIsPopupNotify()
+    {
+        return s_bPopupNotify;
+    }
+
+}//namespace cocos2d
+

@@ -29,14 +29,6 @@ NS_CC_BEGIN
 
 typedef std::basic_string<TUChar> stdTUString;
 
-void CCMessageBox(const std::string& msg, const std::string& title)
-{
-    TUChar szText[256] = { 0 };
-    TUString::StrUtf8ToStrUnicode(szText,(Char*)msg.c_str());
-    TMessageBox box(szText, NULL, WMB_OK);
-    box.Show();
-}
-
 class BitmapDC
 {
 public:
@@ -305,12 +297,12 @@ bool CCImage::initWithString(
         CC_BREAK_IF(nWidth <= 0 || nHeight <= 0);
 
         INT32 nDataLen = pBitmap->GetRowBytes() * nHeight;
-        m_pData.reset(new ccxByte[nDataLen]);
-        CC_BREAK_IF(! m_pData.get());
-        memcpy((void*) m_pData.get(), pBitmap->GetDataPtr(), nDataLen);
+        m_pData = new unsigned char[nDataLen];
+        CC_BREAK_IF(! m_pData);
+        memcpy((void*) m_pData, pBitmap->GetDataPtr(), nDataLen);
 
-        m_nWidth    = (ccxInt16)nWidth;
-        m_nHeight   = (ccxInt16)nHeight;
+        m_nWidth    = (short)nWidth;
+        m_nHeight   = (short)nHeight;
         m_bHasAlpha = true;
         m_bPreMulti = true;
         m_nBitsPerComponent = pBitmap->GetDepth() / 4;

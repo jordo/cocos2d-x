@@ -24,17 +24,20 @@ THE SOFTWARE.
 #include "Cocos2dJni.h"
 #include "CCSet.h"
 #include "CCDirector.h"
+#include "CCKeypadDispatcher.h"
 #include "CCTouch.h"
 #include "CCTouchDispatcher.h"
 #include "CCFileUtils.h"
 #include "CCGeometry.h"
 #include "platform/android/CCAccelerometer_android.h"
 #include <android/log.h>
-#define  LOG_TAG    "Cocos2dJni"
-#define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
 
+#if 0
 #define  LOG_TAG    "Cocos2dJni"
 #define  LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG,LOG_TAG,__VA_ARGS__)
+#else
+#define  LOGD(...) 
+#endif
 
 using namespace cocos2d;
 
@@ -42,8 +45,7 @@ extern "C"
 {
 
 	#define MAX_TOUCHES         5
-	static cocos2d::CCTouch *s_pTouches[MAX_TOUCHES] = { NULL };
-	static cocos2d::CCSet s_set;
+	static CCTouch *s_pTouches[MAX_TOUCHES] = { NULL };
 
 	// handle accelerometer changes
 
@@ -58,84 +60,54 @@ extern "C"
 		                                                         timeStamp);
 	}
 
-	// handle touch event
-	
-	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(JNIEnv*  env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
+	// handle touch event	
+	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesBegin(JNIEnv*  env, jobject thiz, jint id, jfloat x, jfloat y)
 	{
-		int size = env->GetArrayLength(ids);
-		jint id[size];
-		jfloat x[size];
-		jfloat y[size];
 		CCRect rcRect = CCEGLView::sharedOpenGLView().getViewPort();
 		float fScreenScaleFactor = CCEGLView::sharedOpenGLView().getScreenScaleFactor();
+		CCSet set;
 
-		env->GetIntArrayRegion(ids, 0, size, id);
-		env->GetFloatArrayRegion(xs, 0, size, x);
-		env->GetFloatArrayRegion(ys, 0, size, y);
+		CCTouch *pTouch = s_pTouches[id];
+		if (! pTouch)
+		{
+			LOGD("Beginning touches with id: %d, x=%f, y=%f", id, x, y);
 
-		for( int i = 0 ; i < size ; i++ ) {
-			cocos2d::CCTouch* pTouch = s_pTouches[id[i]];
-			LOGD("Should create new pTouch if null: %d", pTouch);
-			if (!pTouch)
-			{
-				pTouch = new cocos2d::CCTouch;
-			}
+			pTouch = new CCTouch();			
+			pTouch->SetTouchInfo(0, (x - rcRect.origin.x) / fScreenScaleFactor, (y - rcRect.origin.y) / fScreenScaleFactor);
+			s_pTouches[id] = pTouch;
+			set.addObject(pTouch);
 
-			LOGD("Beginning touches with id: %d, x=%f, y=%f", id[i], x[i], y[i]);
-			pTouch->SetTouchInfo(0, (x[i] - rcRect.origin.x) / fScreenScaleFactor , 
-			                        (y[i] - rcRect.origin.y) / fScreenScaleFactor);
-
-			s_set.addObject(pTouch);
-			s_pTouches[id[i]] = pTouch;
+			cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesBegan(&set, NULL);
+		}	
+		else
+		{
+			LOGD("Beginnig touches with id: %d error", id);
 		}
-
-		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesBegan(&s_set, NULL);
 	}
 	
-	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(JNIEnv*  env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
+	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesEnd(JNIEnv*  env, jobject thiz, jint id, jfloat x, jfloat y)
 	{
-
-		int size = env->GetArrayLength(ids);
-		jint id[size];
-		jfloat x[size];
-		jfloat y[size];
 		CCRect rcRect = CCEGLView::sharedOpenGLView().getViewPort();
 		float fScreenScaleFactor = CCEGLView::sharedOpenGLView().getScreenScaleFactor();
-
-		env->GetIntArrayRegion(ids, 0, size, id);
-		env->GetFloatArrayRegion(xs, 0, size, x);
-		env->GetFloatArrayRegion(ys, 0, size, y);
+		CCSet set;
 
 		/* Add to the set to send to the director */
-		for( int i = 0 ; i < size ; i++ ) {
-			cocos2d::CCTouch* pTouch = s_pTouches[id[i]];
-			LOGD("Ending touches with id: %d, x=%f, y=%f", id[i], x[i], y[i]);
-			if (pTouch)
-			{
-				pTouch->SetTouchInfo(0, (x[i] - rcRect.origin.x) / fScreenScaleFactor , 
-			                        (y[i] - rcRect.origin.y) / fScreenScaleFactor);
-				s_set.addObject(pTouch);
-			} else {
-				LOGD("Error adding the touch to remove");
-			}
-		}
+		CCTouch* pTouch = s_pTouches[id];		
+		if (pTouch)
+		{
+			LOGD("Ending touches with id: %d, x=%f, y=%f", id, x, y);
 
-		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesEnded(&s_set, NULL);
+			pTouch->SetTouchInfo(0, (x - rcRect.origin.x) / fScreenScaleFactor , (y - rcRect.origin.y) / fScreenScaleFactor);
+		    set.addObject(pTouch);
 
-		/* Update the set status */
-		for( int i = 0 ; i < size ; i++ ) {
-			cocos2d::CCTouch* pTouch = s_pTouches[id[i]];
-			LOGD("Ending touches with id: %d, x=%f, y=%f", id[i], x[i], y[i]);
-			if (pTouch)
-			{
-				s_set.removeObject(pTouch);
-				pTouch->release();
-				s_pTouches[id[i]] = NULL;
-			} else {
-				LOGD("Error removing from the set!");
-			}
+			// release the object
+			pTouch->release();
+			s_pTouches[id] = NULL;
 
-		}
+			cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesEnded(&set, NULL);
+		} else {
+			LOGD("Ending touches with id: %d error", id);
+		}		
 	}
 	
 	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesMove(JNIEnv*  env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
@@ -146,6 +118,7 @@ extern "C"
 		jfloat y[size];
 		CCRect rcRect = CCEGLView::sharedOpenGLView().getViewPort();
 		float fScreenScaleFactor = CCEGLView::sharedOpenGLView().getScreenScaleFactor();
+		CCSet set;
 
 		env->GetIntArrayRegion(ids, 0, size, id);
 		env->GetFloatArrayRegion(xs, 0, size, x);
@@ -158,11 +131,17 @@ extern "C"
 			{
 				pTouch->SetTouchInfo(0, (x[i] - rcRect.origin.x) / fScreenScaleFactor , 
 			                        (y[i] - rcRect.origin.y) / fScreenScaleFactor);
-				s_set.addObject(pTouch);
+				set.addObject(pTouch);
+			}
+			else
+			{
+				// It is error, should return.
+				LOGD("Moving touches with id: %d error", id[i]);
+				return;
 			}
 		}
 		
-		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesMoved(&s_set, NULL);
+		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesMoved(&set, NULL);
 	}
 
 	void Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeTouchesCancel(JNIEnv*  env, jobject thiz, jintArray ids, jfloatArray xs, jfloatArray ys)
@@ -173,6 +152,7 @@ extern "C"
 		jfloat y[size];
 		CCRect rcRect = CCEGLView::sharedOpenGLView().getViewPort();
 		float fScreenScaleFactor = CCEGLView::sharedOpenGLView().getScreenScaleFactor();
+		CCSet set;
 
 		env->GetIntArrayRegion(ids, 0, size, id);
 		env->GetFloatArrayRegion(xs, 0, size, x);
@@ -184,12 +164,36 @@ extern "C"
 			{
 				pTouch->SetTouchInfo(0, (x[i] - rcRect.origin.x) / fScreenScaleFactor , 
 			                        (y[i] - rcRect.origin.y) / fScreenScaleFactor);
-				s_set.addObject(pTouch);
+				set.addObject(pTouch);
 				s_pTouches[id[i]] = NULL;
+				pTouch->release();
 			}
 		}
 
-		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesCancelled(&s_set, NULL);
+		cocos2d::CCDirector::sharedDirector()->getOpenGLView()->getDelegate()->touchesCancelled(&set, NULL);
+	}
+
+#define KEYCODE_BACK 0x04
+#define KEYCODE_MENU 0x52
+	
+	// handle keydown event
+
+	jboolean Java_org_cocos2dx_lib_Cocos2dxRenderer_nativeKeyDown(JNIEnv*  env, jobject thiz, jint keyCode)
+	{
+		switch (keyCode)
+		{
+		case KEYCODE_BACK:
+			if (CCKeypadDispatcher::sharedDispatcher()->dispatchKeypadMSG(kTypeBackClicked))
+				return JNI_TRUE;
+			break;
+		case KEYCODE_MENU:
+			if (CCKeypadDispatcher::sharedDispatcher()->dispatchKeypadMSG(kTypeMenuClicked))
+				return JNI_TRUE;
+			break;
+		default:
+			return JNI_FALSE;
+		}
+		return JNI_FALSE;
 	}
 
     void Java_org_cocos2dx_lib_Cocos2dxActivity_nativeSetPaths(JNIEnv*  env, jobject thiz, jstring apkPath)
@@ -237,7 +241,7 @@ extern "C"
 		{
 			LOGD("Failed to find class of org/cocos2dx/lib/Cocos2dxActivity");
 			return 0;
-		}
+		}		
 
 		if (env != 0 && classOfCocos2dxActivity != 0)
 		{
@@ -254,7 +258,6 @@ extern "C"
 
 	void enableAccelerometerJNI()
 	{
-		// void stopBackgroundMusic()
 		jmethodID methodID = getMethodID("enableAccelerometer", "()V");
 
 		if (methodID)
@@ -265,12 +268,38 @@ extern "C"
 
 	void disableAccelerometerJNI()
 	{
-		// void stopBackgroundMusic()
 		jmethodID methodID = getMethodID("disableAccelerometer", "()V");
 
 		if (methodID)
 		{
 			env->CallStaticVoidMethod(classOfCocos2dxActivity, methodID);
+		}
+	}
+
+	void showMessageBoxJNI(const char * pszMsg, const char * pszTitle)
+	{
+		if (! pszMsg)
+		{
+			return;
+		}
+
+		jmethodID methodID = getMethodID("showMessageBox", "(Ljava/lang/String;Ljava/lang/String;)V");
+
+		if (methodID)
+		{
+			jstring StringArg1;
+
+			if (! pszTitle)
+			{
+				StringArg1 = env->NewStringUTF("");
+			}
+			else
+			{
+				StringArg1 = env->NewStringUTF(pszTitle);
+			}
+
+			jstring StringArg2 = env->NewStringUTF(pszMsg);
+			env->CallStaticVoidMethod(classOfCocos2dxActivity, methodID, StringArg1, StringArg2);
 		}
 	}
 

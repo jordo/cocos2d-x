@@ -33,6 +33,7 @@ class CC_DLL CCImage
 {
 public:
     CCImage();
+    ~CCImage();
 
     typedef enum
     {
@@ -88,7 +89,7 @@ public:
         const char *    pFontName = 0,
         int             nSize = 0);
 
-    ccxByte *   getData()               { return m_pData.get(); }
+    unsigned char *   getData()               { return m_pData; }
     int         getDataLen()            { return m_nWidth * m_nHeight; }
     int         getColorSpace()         { return 1; }
 
@@ -102,22 +103,15 @@ public:
     */
     bool saveToFile(const char * pszFilePath) { return false; }
 
-    CC_SYNTHESIZE_READONLY(ccxInt16,   m_nWidth,       Width);
-    CC_SYNTHESIZE_READONLY(ccxInt16,   m_nHeight,      Height);
+    CC_SYNTHESIZE_READONLY(short,   m_nWidth,       Width);
+    CC_SYNTHESIZE_READONLY(short,   m_nHeight,      Height);
     CC_SYNTHESIZE_READONLY(int,        m_nBitsPerComponent,         BitsPerComponent);
-
-public:
-    /**
-    @brief Set/Get whether pop-up a message box when the image load failed
-    */
-    static void setIsPopupNotify(bool bNotify);
-    static bool getIsPopupNotify();
 
 protected:
     bool _initWithJpgData(void * pData, int nDatalen);
     bool _initWithPngData(void * pData, int nDatalen);
 
-    ccxScopedArray<ccxByte> m_pData;
+    unsigned char * m_pData;
     bool m_bHasAlpha;
     bool m_bPreMulti;
 

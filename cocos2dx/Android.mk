@@ -25,6 +25,7 @@ cocoa/CCAffineTransform.cpp \
 cocoa/CCGeometry.cpp \
 cocoa/CCAutoreleasePool.cpp \
 cocoa/CCData.cpp \
+cocoa/CCNS.cpp \
 cocoa/CCObject.cpp \
 cocoa/CCSet.cpp \
 cocoa/CCZone.cpp \
@@ -50,6 +51,7 @@ particle_nodes/CCParticleExamples.cpp \
 particle_nodes/CCParticleSystem.cpp \
 particle_nodes/CCParticleSystemQuad.cpp \
 platform/CCDirector_mobile.cpp \
+platform/CCFileUtils.cpp \
 platform/CCGrid_mobile.cpp \
 platform/CCLayer_mobile.cpp \
 platform/CCMenu_mobile.cpp \
@@ -63,9 +65,7 @@ platform/CCCommon.cpp \
 platform/CCParticleSystemPoint_mobile.cpp \
 platform/CCTransition_mobile.cpp \
 platform/platform.cpp \
-platform/android/CCNS_android.cpp \
 platform/android/CCEGLView_android.cpp \
-platform/android/CCFileUtils_android.cpp \
 platform/android/CCAccelerometer_android.cpp \
 platform/android/CCApplication_android.cpp \
 platform/android/Cocos2dJni.cpp \
@@ -81,7 +81,6 @@ support/CCPointExtension.cpp \
 support/TransformUtils.cpp \
 support/base64.cpp \
 support/ccUtils.cpp \
-support/file_support/FileUtils.cpp \
 support/image_support/TGAlib.cpp \
 support/zip_support/ZipUtils.cpp \
 support/zip_support/ioapi.cpp \

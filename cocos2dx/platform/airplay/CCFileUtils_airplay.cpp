@@ -27,7 +27,6 @@
 #include "expat.h"
 #include "CCString.h"
 
-#include "support/file_support/FileData.h"
 #include "support/zip_support/unzip.h"
 #include "../CCSAXParser.h"
 #include "CCApplication.h"
@@ -54,6 +53,8 @@ public:
 	std::stack<CCDictionary<std::string, CCObject*>*> m_tDictStack;
 	std::string m_sCurKey;///< parsed key
 	CCSAXState m_tState;
+    bool    m_bInArray;
+    CCMutableArray<CCObject*> *m_pArray;
 
 public:
 	CCDictMaker()
@@ -61,6 +62,9 @@ public:
 		m_pRootDict = NULL;
 		m_pCurDict = NULL;
 		m_tState = SAX_NONE;
+
+        m_pArray = NULL;
+        m_bInArray = false;
 	}
 	~CCDictMaker()
 	{
@@ -81,91 +85,141 @@ public:
 
 void startElement(void *ctx, const XML_Char *name, const XML_Char **atts)
 {
-	CCDictMaker *pMaker = this;
 	std::string sName((char*)name);
 	if( sName == "dict" )
 	{
 		CCDictionary<std::string, CCObject*> *pNewDict = new CCDictionary<std::string, CCObject*>();
-		if(! pMaker->m_pRootDict)
+		if(! m_pRootDict)
 		{
-			pMaker->m_pRootDict = pNewDict;
+			m_pRootDict = pNewDict;
 			pNewDict->autorelease();
 		}
 		else
 		{
-			CCAssert(pMaker->m_pCurDict && !pMaker->m_sCurKey.empty(), "");
-			pMaker->m_pCurDict->setObject(pNewDict, pMaker->m_sCurKey);
+			CCAssert(m_pCurDict && !m_sCurKey.empty(), "");
+			m_pCurDict->setObject(pNewDict, m_sCurKey);
 			pNewDict->release();
-			pMaker->m_sCurKey.clear();
+			m_sCurKey.clear();
 		}
-		pMaker->m_pCurDict = pNewDict;
-		pMaker->m_tDictStack.push(pMaker->m_pCurDict);
-		pMaker->m_tState = SAX_DICT;
+		m_pCurDict = pNewDict;
+		m_tDictStack.push(m_pCurDict);
+		m_tState = SAX_DICT;
 	}
 	else if(sName == "key")
 	{
-		pMaker->m_tState = SAX_KEY;
+		m_tState = SAX_KEY;
 	}
 	else if(sName == "integer")
 	{
-		pMaker->m_tState = SAX_INT;
+		m_tState = SAX_INT;
 	}
 	else if(sName == "real")
 	{
-		pMaker->m_tState = SAX_REAL;
+		m_tState = SAX_REAL;
 	}
 	else if(sName == "string")
 	{
-		pMaker->m_tState = SAX_STRING;
+		m_tState = SAX_STRING;
 	}
 	else
 	{
-		pMaker->m_tState = SAX_NONE;
+        if (sName == "array")
+        {
+            m_bInArray = true;
+            m_pArray = new CCMutableArray<CCObject*>();
+        }
+		m_tState = SAX_NONE;
 	}	
 }
 void endElement(void *ctx, const XML_Char *name)
 {
-	CCDictMaker * pMaker = this;
 	std::string sName((char*)name);
 	if( sName == "dict" )
 	{
-		pMaker->m_tDictStack.pop();
-		if ( !pMaker->m_tDictStack.empty() )
+		m_tDictStack.pop();
+		if ( !m_tDictStack.empty() )
 		{
-			pMaker->m_pCurDict = (CCDictionary<std::string, CCObject*>*)(pMaker->m_tDictStack.top());
+			m_pCurDict = (CCDictionary<std::string, CCObject*>*)(m_tDictStack.top());
 		}
 	}
-	pMaker->m_tState = SAX_NONE;
+    else if (sName == "array")
+    {
+        CCAssert(m_bInArray, "The plist file is wrong!");
+        m_pCurDict->setObject(m_pArray, m_sCurKey);
+        m_pArray->release();
+        m_pArray = NULL;
+        m_bInArray = false;
+    }
+    else if (sName == "true")
+    {
+        CCString *str = new CCString("1");
+        if (m_bInArray)
+        {
+            m_pArray->addObject(str);
+        }
+        else
+        {
+            m_pCurDict->setObject(str, m_sCurKey);
+        }
+        str->release();
+    }
+    else if (sName == "false")
+    {
+        CCString *str = new CCString("0");
+        if (m_bInArray)
+        {
+            m_pArray->addObject(str);
+        }
+        else
+        {
+            m_pCurDict->setObject(str, m_sCurKey);
+        }
+        str->release();
+    }
+	m_tState = SAX_NONE;
 }
 
 void textHandler(void *ctx, const XML_Char *ch, int len)
 {
- 	CCDictMaker * pMaker = this;
-	if (pMaker->m_tState == SAX_NONE)
+	if (m_tState == SAX_NONE)
 	{
 		return;
 	}
  	CCString *pText = new CCString();
 	pText->m_sString = std::string((char*)ch,0,len);
 
- 	switch(pMaker->m_tState)
+ 	switch(m_tState)
  	{
  	case SAX_KEY:
 		{
-			pMaker->m_sCurKey = pText->m_sString;
+			m_sCurKey = pText->m_sString;
 		}
  		break;
  	case SAX_INT:
  	case SAX_REAL:
  		{
- 			CCAssert(!pMaker->m_sCurKey.empty(), "not found real : <integet/real>");
- 			pMaker->m_pCurDict->setObject(pText, pMaker->m_sCurKey);
+ 			CCAssert(!m_sCurKey.empty(), "not found real : <integet/real>");
+            if (m_bInArray)
+            {
+                m_pArray->addObject(pText);
+            }
+            else
+            {
+                m_pCurDict->setObject(pText, m_sCurKey);
+            }
  			break;
  		}
  	case SAX_STRING:
  		{
- 			CCAssert(!pMaker->m_sCurKey.empty(), "not found string");
- 			pMaker->m_pCurDict->setObject(pText, pMaker->m_sCurKey);
+ 			CCAssert(!m_sCurKey.empty(), "not found string");
+            if (m_bInArray)
+            {
+                m_pArray->addObject(pText);
+            }
+            else
+            {
+                m_pCurDict->setObject(pText, m_sCurKey);
+            }
  			break;
  		}
  	}
@@ -227,9 +281,15 @@ unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* psz
 
 	s3eFile* pFile = s3eFileOpen(pszFileName, pszMode);
 	
-
-	IwAssertMsg(GAME, pFile, ("Open file %s Failed. s3eFileError Code : %i", pszFileName, s3eFileGetError()));
-	
+    if (! pFile && getIsPopupNotify())
+    {    
+        IwAssertMsg(GAME, pFile, ("Open file %s Failed. s3eFileError Code : %i", pszFileName, s3eFileGetError()));
+    }
+    if (! pFile) 
+    {
+        *pSize = 0;
+        return 0;
+    }
 	int32 fileSize = s3eFileGetSize(pFile);
 	*pSize=fileSize;
 
@@ -242,5 +302,43 @@ unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* psz
 	
 	return (unsigned char*)pDataToBeReadBinary;
 }
+
+std::string& CCFileUtils::ccRemoveHDSuffixFromFile(std::string& path)
+{
+#if CC_IS_RETINA_DISPLAY_SUPPORTED
+
+    if( CC_CONTENT_SCALE_FACTOR() == 2 )
+    {
+        std::string::size_type pos = path.rfind("/") + 1; // the begin index of last part of path
+
+        std::string::size_type suffixPos = path.rfind(CC_RETINA_DISPLAY_FILENAME_SUFFIX);
+        if (std::string::npos != suffixPos && suffixPos > pos)
+        {
+            CCLog("cocos2d: FilePath(%s) contains suffix(%s), remove it.", path.c_str(),
+                CC_RETINA_DISPLAY_FILENAME_SUFFIX);
+            path.replace(suffixPos, strlen(CC_RETINA_DISPLAY_FILENAME_SUFFIX), "");
+        }
+    }
+
+#endif // CC_IS_RETINA_DISPLAY_SUPPORTED
+
+    return path;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Notification support when getFileData from a invalid file
+///////////////////////////////////////////////////////////////////////////////
+static bool s_bPopupNotify = true;
+
+void CCFileUtils::setIsPopupNotify(bool bNotify)
+{
+    s_bPopupNotify = bNotify;
+}
+
+bool CCFileUtils::getIsPopupNotify()
+{
+    return s_bPopupNotify;
+}
+
 NS_CC_END; 
 
