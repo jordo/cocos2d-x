@@ -44,7 +44,7 @@ void CCFileUtils::setRelativePath(const char* pszRelativePath)
 	s_strRelativePath = pszRelativePath;
 	
 	// if the path is not ended with '/', append it
-	if (s_strRelativePath.find("/") != (strlen(s_strRelativePath.c_str()) - 1))
+	if (s_strRelativePath.find_last_of("/") != (strlen(s_strRelativePath.c_str()) - 1))
 	{
 		s_strRelativePath += "/";
 	}
