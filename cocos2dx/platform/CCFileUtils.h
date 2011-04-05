@@ -45,6 +45,13 @@ public:
     static unsigned char* getFileData(const char* pszFileName, const char* pszMode, unsigned long * pSize);
 
     /**
+	@brief Checks if a file exists
+	@param[in]  pszFileName The resource file name which contain the path
+	@return true if file exists.  false otherwise.
+	*/
+	static bool fileExists(const char* pszFileName);
+
+    /**
     @brief Get resource file data from zip file
     @param[in]  pszFileName The resource file name which contain the relative path of zip file
     @param[out] pSize If get the file data succeed the it will be the data size,or it will be 0

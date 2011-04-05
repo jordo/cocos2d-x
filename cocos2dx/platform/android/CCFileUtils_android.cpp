@@ -79,6 +79,35 @@ const char *CCFileUtils::fullPathFromRelativeFile(const char *pszFilename, const
 	return pRet->m_sString.c_str();
 }
 
+bool CCFileUtils::fileExists(const char* pszFileName) {
+	string fullPath = s_strRelativePath + pszFileName;
+	const char* pszZipFilePath = s_strResourcePath.c_str();
+	const char* pszFileNameFull = fullPath.c_str();
+	unsigned char * pBuffer = NULL;
+	unzFile pFile = NULL;
+
+	bool found = false;
+	do
+	{
+		CC_BREAK_IF(!pszZipFilePath || !pszFileNameFull);
+		CC_BREAK_IF(strlen(pszZipFilePath) == 0);
+
+		pFile = unzOpen(pszZipFilePath);
+		CC_BREAK_IF(!pFile);
+
+		int nRet = unzLocateFile(pFile, pszFileNameFull, 1);
+		CC_BREAK_IF(UNZ_OK != nRet)
+		found = true;
+	} while (0);
+
+	if (pFile)
+	{
+		unzClose(pFile);
+	}
+
+	return found;
+}
+
 unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* pszMode, unsigned long * pSize)
 {	
 	string fullPath = s_strRelativePath + pszFileName;
