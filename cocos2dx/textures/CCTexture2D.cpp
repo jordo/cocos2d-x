@@ -122,9 +122,12 @@ namespace   cocos2d {
                 vt->data = 0;   
             }
 
-            switch(f) {          
-    case kCCTexture2DPixelFormat_RGBA8888:
+            switch(f) {
     case kCCTexture2DPixelFormat_RGBA4444:
+    	vt->data = new unsigned char[w * h * 2];
+        memcpy(vt->data, d, w * h * 2);
+    	break;
+    case kCCTexture2DPixelFormat_RGBA8888:
     case kCCTexture2DPixelFormat_RGB5A1:
     case kCCTexture2DPixelFormat_RGB565:
     case kCCTexture2DPixelFormat_A8:

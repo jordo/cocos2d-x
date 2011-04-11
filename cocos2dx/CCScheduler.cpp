@@ -204,7 +204,7 @@ void CCScheduler::unscheduleAllTimers()
 	assert(false);
 }
 
-void CCScheduler::scheduleSelector(SEL_SCHEDULE pfnSelector, SelectorProtocol *pTarget, float fInterval, bool bPaused)
+void CCScheduler::scheduleSelector(SEL_SCHEDULE pfnSelector, SelectorProtocol *pTarget, ccTime fInterval, bool bPaused)
 {
 	assert(pfnSelector);
 	assert(pTarget);
