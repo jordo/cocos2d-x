@@ -1,6 +1,7 @@
 package org.cocos2dx.application;
 import org.cocos2dx.lib.Cocos2dxActivity;
 import org.cocos2dx.lib.Cocos2dxGLSurfaceView;
+import org.cocos2dx.application.R;
 
 
 import android.opengl.GLSurfaceView;
@@ -12,10 +13,20 @@ public class ApplicationDemo extends Cocos2dxActivity{
 		
 		// get the packageName,it's used to set the resource path
 		String packageName = getApplication().getPackageName();
-		super.setPackgeName(packageName);
+		super.setPackageName(packageName);
 		
-        mGLView = new Cocos2dxGLSurfaceView(this);
-        setContentView(mGLView);
+		setContentView(R.layout.helloworld_demo);
+        mGLView = (Cocos2dxGLSurfaceView) findViewById(R.id.helloworld_gl_surfaceview);
+
+        // Get the size of the mGLView after the layout happens
+        mGLView.post(new Runnable() {
+            
+            @Override
+            public void run() {
+                Cocos2dxActivity.screenHeight = mGLView.getHeight();
+                Cocos2dxActivity.screenWidth = mGLView.getWidth();
+            }
+        });
 	}
 	
 	 @Override

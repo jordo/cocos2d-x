@@ -22,6 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 ****************************************************************************/
 
+#include "windows.h"
+
+using namespace std;
+
 NS_CC_BEGIN;
 
 // record the resource path
@@ -33,17 +37,9 @@ void _CheckPath()
 	{
 		WCHAR  wszPath[MAX_PATH];
 		int nNum = WideCharToMultiByte(CP_ACP, 0, wszPath, 
-			GetModuleFileName(NULL, wszPath, MAX_PATH), 
+			GetCurrentDirectoryW(sizeof(wszPath), wszPath), 
 			s_pszResourcePath, MAX_PATH, NULL, NULL);
-
-		for (int i = nNum; i >= 0; --i)
-		{
-			if (L'\\' == s_pszResourcePath[i])
-			{
-				s_pszResourcePath[i + 1] = 0;
-				break;
-			}
-		}
+        s_pszResourcePath[nNum] = '\\';
 	}
 }
 
@@ -63,10 +59,13 @@ const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath)
     pRet->autorelease();
     if ((strlen(pszRelativePath) > 1 && pszRelativePath[1] == ':'))
     {
+        // path start with "x:", is absolute path
         pRet->m_sString = pszRelativePath;
     }
-    else if (strlen(pszRelativePath) > 0 && pszRelativePath[0] == '/')
+    else if (strlen(pszRelativePath) > 0 
+        && ('/' == pszRelativePath[0] || '\\' == pszRelativePath[0]))
     {
+        // path start with '/' or '\', is absolute path without driver name
 		char szDriver[3] = {s_pszResourcePath[0], s_pszResourcePath[1], 0};
         pRet->m_sString = szDriver;
         pRet->m_sString += pszRelativePath;
@@ -105,10 +104,11 @@ const char* CCFileUtils::fullPathFromRelativePath(const char *pszRelativePath)
 const char *CCFileUtils::fullPathFromRelativeFile(const char *pszFilename, const char *pszRelativeFile)
 {
 	_CheckPath();
-	std::string relativeFile = fullPathFromRelativePath(pszRelativeFile);
+	// std::string relativeFile = fullPathFromRelativePath(pszRelativeFile);
+	std::string relativeFile = pszRelativeFile;
 	CCString *pRet = new CCString();
 	pRet->autorelease();
-	pRet->m_sString = relativeFile.substr(0, relativeFile.rfind('/')+1);
+	pRet->m_sString = relativeFile.substr(0, relativeFile.find_last_of("/\\") + 1);
 	pRet->m_sString += pszFilename;
 	return pRet->m_sString.c_str();
 }
@@ -142,7 +142,7 @@ unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* psz
     return pBuffer;
 }
 
-void CCFileUtils::setResource(const char* pszZipFileName, const char* pszResPath)
+void CCFileUtils::setResource(const char* pszZipFileName)
 {
     CCAssert(0, "Have not implement!");
 }
@@ -156,6 +156,21 @@ const char* CCFileUtils::getResourcePath(void)
 void CCFileUtils::setRelativePath(const char* pszRelativePath)
 {
     CCAssert(0, "Have not implement!");
+}
+
+string CCFileUtils::getWriteablePath()
+{
+	// return the path that the exe file saved in
+
+	char full_path[_MAX_PATH + 1];
+	::GetModuleFileNameA(NULL, full_path, _MAX_PATH + 1);
+
+	string ret((char*)full_path);
+
+	// remove xxx.exe
+	ret =  ret.substr(0, ret.rfind("\\") + 1);
+
+	return ret;
 }
 
 NS_CC_END;

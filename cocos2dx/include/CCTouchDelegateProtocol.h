@@ -34,27 +34,31 @@ typedef enum
 {
 	ccTouchDelegateStandardBit = 1 << 0,
 	ccTouchDelegateTargetedBit = 1 << 1,
-	ccTouchDeletateAllBit      = (ccTouchDelegateStandardBit | ccTouchDelegateTargetedBit),
+	ccTouchDelegateAllBit      = (ccTouchDelegateStandardBit | ccTouchDelegateTargetedBit),
 } ccTouchDelegateFlag;
 
 class CCTouch;
 class CCEvent;
 class CCSet;
+class CCTouchDispatcher;
+	
 class CC_DLL CCTouchDelegate
 {
 protected:
 	ccTouchDelegateFlag m_eTouchDelegateType;
 
 public:
+	friend class CCTouchDispatcher; // only CCTouchDispatcher & children can change m_eTouchDelegateType
 	inline ccTouchDelegateFlag getTouchDelegateType(void) { return m_eTouchDelegateType; }
+	
 	//! call the release() in child(layer or menu)
 	virtual void destroy(void) {}
 	//! call the retain() in child (layer or menu)
 	virtual void keep(void) {}
 
 	virtual bool ccTouchBegan(CCTouch *pTouch, CCEvent *pEvent) { return false;};
-
 	// optional
+
 	virtual void ccTouchMoved(CCTouch *pTouch, CCEvent *pEvent) {}
 	virtual void ccTouchEnded(CCTouch *pTouch, CCEvent *pEvent) {}
 	virtual void ccTouchCancelled(CCTouch *pTouch, CCEvent *pEvent) {}

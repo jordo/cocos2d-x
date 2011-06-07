@@ -26,6 +26,7 @@ LOCAL_SRC_FILES := main.cpp \
 ../../../tests/ChipmunkTest/Sensors.cpp \
 ../../../tests/ChipmunkTest/Simple.cpp \
 ../../../tests/ChipmunkTest/Springies.cpp \
+../../../tests/ChipmunkTest/Tank.cpp \
 ../../../tests/ChipmunkTest/TheoJansen.cpp \
 ../../../tests/ChipmunkTest/Tumble.cpp \
 ../../../tests/ChipmunkTest/UnsafeOps.cpp \
@@ -34,6 +35,7 @@ LOCAL_SRC_FILES := main.cpp \
 ../../../tests/ClickAndMoveTest/ClickAndMoveTest.cpp \
 ../../../tests/CocosDenshionTest/CocosDenshionTest.cpp \
 ../../../tests/CocosNodeTest/CocosNodeTest.cpp \
+../../../tests/CurlTest/CurlTest.cpp \
 ../../../tests/DrawPrimitivesTest/DrawPrimitivesTest.cpp \
 ../../../tests/EaseActionsTest/EaseActionsTest.cpp \
 ../../../tests/EffectsAdvancedTest/EffectsAdvancedTest.cpp \
@@ -43,6 +45,7 @@ LOCAL_SRC_FILES := main.cpp \
 ../../../tests/KeypadTest/KeypadTest.cpp \
 ../../../tests/LabelTest/LabelTest.cpp \
 ../../../tests/LayerTest/LayerTest.cpp \
+../../../tests/TextInputTest/TextInputTest.cpp \
 ../../../tests/MenuTest/MenuTest.cpp \
 ../../../tests/MotionStreakTest/MotionStreakTest.cpp \
 ../../../tests/ParallaxTest/ParallaxTest.cpp \
@@ -64,6 +67,7 @@ LOCAL_SRC_FILES := main.cpp \
 ../../../tests/TouchesTest/Paddle.cpp \
 ../../../tests/TouchesTest/TouchesTest.cpp \
 ../../../tests/TransitionsTest/TransitionsTest.cpp \
+../../../tests/UserDefaultTest/UserDefaultTest.cpp \
 ../../../tests/ZwoptexTest/ZwoptexTest.cpp \
 ../../../tests/controller.cpp \
 ../../../tests/testBasic.cpp \
@@ -72,25 +76,31 @@ LOCAL_SRC_FILES := main.cpp \
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/../../../../cocos2dx \
                    $(LOCAL_PATH)/../../../../cocos2dx/include \
                    $(LOCAL_PATH)/../../../../cocos2dx/platform \
+                   $(LOCAL_PATH)/../../../../cocos2dx/platform/third_party/android/ \
                    $(LOCAL_PATH)/../../../tests \
                    $(LOCAL_PATH)/../../../.. \
                    $(LOCAL_PATH)/../../.. \
                    $(LOCAL_PATH)/../../../../chipmunk/include/chipmunk \
-                   $(LOCAL_PATH)/../../../../CocosDenshion/include 
+                   $(LOCAL_PATH)/../../../../CocosDenshion/include
                    
 # it is used for ndk-r4
-LOCAL_LDLIBS := -L$(LOCAL_PATH)/../../libs/armeabi \
-                -lGLESv1_CM \
-                -lcocos2d -lcocosdenshion -llog \
-                -lbox2d -lchipmunk
+# if you build with nkd-r4, uncomment it   
+# LOCAL_LDLIBS := -L$(LOCAL_PATH)/../../libs/armeabi \
+#                -lGLESv1_CM \
+#                -lcocos2d -lcocosdenshion -llog \
+#                -lbox2d -lchipmunk \
+#                -L$(LOCAL_PATH)/../../../../cocos2dx/platform/third_party/android/libraries -lcurl
+                
 
 # it is used for ndk-r5    
+# if you build with ndk-r4, comment it   
 # because the new Windows toolchain doesn't support Cygwin's drive
 # mapping (i.e /cygdrive/c/ instead of C:/)    
-#LOCAL_LDLIBS := -L$(call host-path, $(LOCAL_PATH)/../../libs/armeabi) \
-#                -lGLESv1_CM \
-#                -lcocos2d -llog -lcocosdenshion \
-#                -lbox2d -lchipmunk
+LOCAL_LDLIBS := -L$(call host-path, $(LOCAL_PATH)/../../libs/armeabi) \
+                -lGLESv1_CM \
+                -lcocos2d -llog -lcocosdenshion \
+                -lbox2d -lchipmunk \
+                -L$(call host-path, $(LOCAL_PATH)/../../../../cocos2dx/platform/third_party/android/libraries) -lcurl
             
 include $(BUILD_SHARED_LIBRARY)
                    

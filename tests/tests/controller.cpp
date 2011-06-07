@@ -5,8 +5,20 @@
 
 static CCPoint s_tCurPos = CCPointZero;
 
+static ccDeviceOrientation s_eOrientation = CCDeviceOrientationPortrait;
+static void ChangeOrientation(ccDeviceOrientation eOrientation)
+{
+    if (s_eOrientation != eOrientation)
+    {
+        s_eOrientation = eOrientation;
+        CCDirector::sharedDirector()->setDeviceOrientation(eOrientation);
+    }
+}
+
 static TestScene* CreateTestScene(int nIdx)
 {
+    CCDirector::sharedDirector()->purgeCachedData();
+
     TestScene* pScene = NULL;
 
     switch (nIdx)
@@ -34,7 +46,7 @@ static TestScene* CreateTestScene(int nIdx)
     case TEST_COCOSNODE:
         pScene = new CocosNodeTestScene(); break;
     case TEST_TOUCHES:
-        CCDirector::sharedDirector()->setDeviceOrientation(CCDeviceOrientationPortrait);
+        ChangeOrientation(CCDeviceOrientationLandscapeRight);
         pScene = new PongScene(); break;
     case TEST_MENU:
         pScene = new MenuTestScene(); break;
@@ -52,11 +64,20 @@ static TestScene* CreateTestScene(int nIdx)
         pScene = new IntervalTestScene(); break;
     case TEST_CHIPMUNK:
 #if (CC_TARGET_PLATFORM != CC_PLATFORM_AIRPLAY)
-		CCDirector::sharedDirector()->setDeviceOrientation(CCDeviceOrientationPortrait);
+        pScene = new ChipmunkTestScene(); break;
+#else
+#ifdef AIRPLAYUSECHIPMUNK
+#if	(AIRPLAYUSECHIPMUNK == 1)
         pScene = new ChipmunkTestScene(); break;
 #endif
-    case TEST_ATLAS:
+#endif
+#endif
+    case TEST_LABEL:
         pScene = new AtlasTestScene(); break;
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_AIRPLAY)
+    case TEST_TEXT_INPUT:
+        pScene = new TextInputTestScene(); break;
+#endif
     case TEST_SPRITE:
         pScene = new SpriteTestScene(); break;
     case TEST_SCHEDULER:
@@ -71,7 +92,7 @@ static TestScene* CreateTestScene(int nIdx)
         pScene = new EffectAdvanceScene(); break;
     case TEST_HIRES:
         pScene = new HiResTestScene(); break;
-#ifndef _WIN32
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_WIN32)
 	case TEST_ACCELEROMRTER:
         pScene = new AccelerometerTestScene(); break;
 #endif
@@ -83,6 +104,12 @@ static TestScene* CreateTestScene(int nIdx)
         pScene = new PerformanceTestScene(); break;
     case TEST_ZWOPTEX:
         pScene = new ZwoptexTestScene(); break;
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_AIRPLAY)
+	case TEST_CURL:
+		pScene = new CurlTestScene(); break;
+	case TEST_USERDEFAULT:
+		pScene = new UserDefaultTestScene(); break;
+#endif
     default:
         break;
     }
@@ -93,13 +120,14 @@ static TestScene* CreateTestScene(int nIdx)
 TestController::TestController()
 : m_tBeginPos(CCPointZero)
 {
-    CCDirector::sharedDirector()->setDeviceOrientation(CCDeviceOrientationLandscapeLeft);
+    // change to default orientation
+    ChangeOrientation(CCDeviceOrientationPortrait);
 
     // add close menu
     CCMenuItemImage *pCloseItem = CCMenuItemImage::itemFromNormalImage(s_pPathClose, s_pPathClose, this, menu_selector(TestController::closeCallback) );
     CCMenu* pMenu =CCMenu::menuWithItems(pCloseItem, NULL);
-
     CCSize s = CCDirector::sharedDirector()->getWinSize();
+
     pMenu->setPosition( CCPointZero );
     pCloseItem->setPosition(CCPointMake( s.width - 30, s.height - 30));
 

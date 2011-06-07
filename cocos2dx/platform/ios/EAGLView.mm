@@ -68,6 +68,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 #import "CCDirector.h"
 #import "CCSet.h"
 #import "CCTouch.h"
+#import "CCIMEDispatcher.h"
 #import "OpenGL_Internal.h"
 
 //CLASS IMPLEMENTATIONS:
@@ -140,7 +141,7 @@ static cocos2d::CCTouch *s_pTouches[MAX_TOUCHES];
 		multiSampling_ = sampling;
 		requestedSamples_ = nSamples;
 		preserveBackbuffer_ = retained;
-		
+		markedText_ = nil;
 		if( ! [self setupSurfaceWithSharegroup:sharegroup] ) {
 			[self release];
 			return nil;
@@ -165,7 +166,8 @@ static cocos2d::CCTouch *s_pTouches[MAX_TOUCHES];
 		multiSampling_= NO;
 		requestedSamples_ = 0;
 		size_ = [eaglLayer bounds].size;
-
+		markedText_ = nil;
+		
 		if( ! [self setupSurfaceWithSharegroup:nil] ) {
 			[self release];
 			return nil;
@@ -174,6 +176,24 @@ static cocos2d::CCTouch *s_pTouches[MAX_TOUCHES];
 	
 	view = self;
     return self;
+}
+
+- (void)didMoveToWindow;
+{
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUIKeyboardNotification:)
+                                                 name:UIKeyboardWillShowNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUIKeyboardNotification:)
+                                                 name:UIKeyboardDidShowNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUIKeyboardNotification:)
+                                                 name:UIKeyboardWillHideNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(onUIKeyboardNotification:)
+                                                 name:UIKeyboardDidHideNotification object:nil];
 }
 
 -(int) getWidth
@@ -491,4 +511,335 @@ static cocos2d::CCTouch *s_pTouches[MAX_TOUCHES];
 	cocos2d::CCDirector::sharedDirector()->getOpenGLView()->touchesCancelled(&set);
 }
 
+#pragma mark -
+#pragma mark UIView - Responder
+
+- (BOOL)canBecomeFirstResponder
+{
+	if (nil != markedText_) {
+		[markedText_ release];
+	}
+    markedText_ = nil;
+    return YES;
+}
+
+#pragma mark -
+#pragma mark UIKeyInput protocol
+
+- (BOOL)hasText
+{
+    return NO;
+}
+
+- (void)insertText:(NSString *)text
+{
+	if (nil != markedText_) {
+		[markedText_ release];
+		markedText_ = nil;
+	}
+    const char * pszText = [text cStringUsingEncoding:NSUTF8StringEncoding];
+    cocos2d::CCIMEDispatcher::sharedDispatcher()->dispatchInsertText(pszText, strlen(pszText));
+}
+
+- (void)deleteBackward
+{
+	if (nil != markedText_) {
+		[markedText_ release];
+		markedText_ = nil;
+	}
+    cocos2d::CCIMEDispatcher::sharedDispatcher()->dispatchDeleteBackward();
+}
+
+#pragma mark -
+#pragma mark UITextInputTrait protocol
+
+-(UITextAutocapitalizationType) autocapitalizationType
+{
+    return UITextAutocapitalizationTypeNone;
+}
+
+#pragma mark -
+#pragma mark UITextInput protocol
+
+#pragma mark UITextInput - properties
+
+@synthesize beginningOfDocument;
+@synthesize endOfDocument;
+@synthesize inputDelegate;
+@synthesize markedTextRange;
+@synthesize markedTextStyle;
+// @synthesize selectedTextRange;       // must implement
+@synthesize tokenizer;
+
+/* Text may have a selection, either zero-length (a caret) or ranged.  Editing operations are
+ * always performed on the text from this selection.  nil corresponds to no selection. */
+- (void)setSelectedTextRange:(UITextRange *)aSelectedTextRange;
+{
+    CCLOG("UITextRange:setSelectedTextRange");
+}
+- (UITextRange *)selectedTextRange;
+{
+	return [[[UITextRange alloc] init] autorelease];
+}
+
+#pragma mark UITextInput - Replacing and Returning Text
+
+- (NSString *)textInRange:(UITextRange *)range;
+{
+    CCLOG("textInRange");
+	return @"";
+}
+- (void)replaceRange:(UITextRange *)range withText:(NSString *)theText;
+{
+    CCLOG("replaceRange");
+}
+
+#pragma mark UITextInput - Working with Marked and Selected Text
+
+
+
+/* If text can be selected, it can be marked. Marked text represents provisionally
+ * inserted text that has yet to be confirmed by the user.  It requires unique visual
+ * treatment in its display.  If there is any marked text, the selection, whether a
+ * caret or an extended range, always resides witihin.
+ *
+ * Setting marked text either replaces the existing marked text or, if none is present,
+ * inserts it from the current selection. */ 
+
+- (void)setMarkedTextRange:(UITextRange *)markedTextRange;
+{
+    CCLOG("setMarkedTextRange");
+}
+
+- (UITextRange *)markedTextRange;
+{
+    CCLOG("markedTextRange");
+	return nil; // Nil if no marked text.
+}
+- (void)setMarkedTextStyle:(NSDictionary *)markedTextStyle;
+{
+    CCLOG("setMarkedTextStyle");
+    
+}
+- (NSDictionary *)markedTextStyle;
+{
+    CCLOG("markedTextStyle");
+	return nil;
+}
+- (void)setMarkedText:(NSString *)markedText selectedRange:(NSRange)selectedRange;
+{
+    CCLOG("setMarkedText");
+	if (markedText == markedText_) {
+		return;
+	}
+	if (nil != markedText_) {
+		[markedText_ release];
+	}
+    markedText_ = markedText;
+	[markedText_ retain];
+}
+- (void)unmarkText;
+{
+    CCLOG("unmarkText");
+    if (nil == markedText_)
+    {
+        return;
+    }
+    const char * pszText = [markedText_ cStringUsingEncoding:NSUTF8StringEncoding];
+    cocos2d::CCIMEDispatcher::sharedDispatcher()->dispatchInsertText(pszText, strlen(pszText));
+	[markedText_ release];
+    markedText_ = nil;
+}
+
+#pragma mark Methods for creating ranges and positions.
+
+- (UITextRange *)textRangeFromPosition:(UITextPosition *)fromPosition toPosition:(UITextPosition *)toPosition;
+{
+    CCLOG("textRangeFromPosition");
+	return nil;
+}
+- (UITextPosition *)positionFromPosition:(UITextPosition *)position offset:(NSInteger)offset;
+{
+    CCLOG("positionFromPosition");
+	return nil;
+}
+- (UITextPosition *)positionFromPosition:(UITextPosition *)position inDirection:(UITextLayoutDirection)direction offset:(NSInteger)offset;
+{
+    CCLOG("positionFromPosition");
+	return nil;
+}
+
+/* Simple evaluation of positions */
+- (NSComparisonResult)comparePosition:(UITextPosition *)position toPosition:(UITextPosition *)other;
+{
+    CCLOG("comparePosition");
+	return 0;
+}
+- (NSInteger)offsetFromPosition:(UITextPosition *)from toPosition:(UITextPosition *)toPosition;
+{
+    CCLOG("offsetFromPosition");
+	return 0;
+}
+
+- (UITextPosition *)positionWithinRange:(UITextRange *)range farthestInDirection:(UITextLayoutDirection)direction;
+{
+    CCLOG("positionWithinRange");
+	return nil;
+}
+- (UITextRange *)characterRangeByExtendingPosition:(UITextPosition *)position inDirection:(UITextLayoutDirection)direction;
+{
+    CCLOG("characterRangeByExtendingPosition");
+	return nil;
+}
+
+#pragma mark Writing direction
+
+- (UITextWritingDirection)baseWritingDirectionForPosition:(UITextPosition *)position inDirection:(UITextStorageDirection)direction;
+{
+    CCLOG("baseWritingDirectionForPosition");
+	return UITextWritingDirectionNatural;
+}
+- (void)setBaseWritingDirection:(UITextWritingDirection)writingDirection forRange:(UITextRange *)range;
+{
+    CCLOG("setBaseWritingDirection");
+}
+
+#pragma mark Geometry
+
+/* Geometry used to provide, for example, a correction rect. */
+- (CGRect)firstRectForRange:(UITextRange *)range;
+{
+    CCLOG("firstRectForRange");
+	return CGRectNull;
+}
+- (CGRect)caretRectForPosition:(UITextPosition *)position;
+{
+	CCLOG("caretRectForPosition");
+	return caretRect_;
+}
+
+#pragma mark Hit testing
+
+/* JS - Find the closest position to a given point */
+- (UITextPosition *)closestPositionToPoint:(CGPoint)point;
+{
+    CCLOG("closestPositionToPoint");
+	return nil;
+}
+- (UITextPosition *)closestPositionToPoint:(CGPoint)point withinRange:(UITextRange *)range;
+{
+    CCLOG("closestPositionToPoint");
+	return nil;
+}
+- (UITextRange *)characterRangeAtPoint:(CGPoint)point;
+{
+    CCLOG("characterRangeAtPoint");
+	return nil;
+}
+
+#pragma mark -
+#pragma mark UIKeyboard notification
+
+- (void)onUIKeyboardNotification:(NSNotification *)notif;
+{
+    NSString * type = notif.name;
+    
+    NSDictionary* info = [notif userInfo];
+    CGRect begin = [self convertRect: 
+                    [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue]
+                            fromView:self];
+    CGRect end = [self convertRect: 
+                  [[info objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue]
+                          fromView:self];
+    double aniDuration = [[info objectForKey:UIKeyboardAnimationDurationUserInfoKey] doubleValue];
+    
+    CGSize viewSize = self.frame.size;
+    CGFloat tmp;
+    
+    switch ([[UIApplication sharedApplication] statusBarOrientation])
+    {
+        case UIInterfaceOrientationPortrait:
+            begin.origin.y = viewSize.height - begin.origin.y - begin.size.height;
+            end.origin.y = viewSize.height - end.origin.y - end.size.height;
+            break;
+            
+        case UIInterfaceOrientationPortraitUpsideDown:
+            begin.origin.x = viewSize.width - (begin.origin.x + begin.size.width);
+            end.origin.x = viewSize.width - (end.origin.x + end.size.width);
+            break;
+            
+        case UIInterfaceOrientationLandscapeLeft:
+            tmp = begin.size.width;
+            begin.size.width = begin.size.height;
+            begin.size.height = tmp;
+            tmp = end.size.width;
+            end.size.width = end.size.height;
+            end.size.height = tmp;
+            tmp = viewSize.width;
+            viewSize.width = viewSize.height;
+            viewSize.height = tmp;
+            
+            tmp = begin.origin.x;
+            begin.origin.x = begin.origin.y;
+            begin.origin.y = viewSize.height - tmp - begin.size.height;
+            tmp = end.origin.x;
+            end.origin.x = end.origin.y;
+            end.origin.y = viewSize.height - tmp - end.size.height;
+            break;
+            
+        case UIInterfaceOrientationLandscapeRight:
+            tmp = begin.size.width;
+            begin.size.width = begin.size.height;
+            begin.size.height = tmp;
+            tmp = end.size.width;
+            end.size.width = end.size.height;
+            end.size.height = tmp;
+            tmp = viewSize.width;
+            viewSize.width = viewSize.height;
+            viewSize.height = tmp;
+            
+            tmp = begin.origin.x;
+            begin.origin.x = begin.origin.y;
+            begin.origin.y = tmp;
+            tmp = end.origin.x;
+            end.origin.x = end.origin.y;
+            end.origin.y = tmp;
+            break;
+            
+        default:
+            break;
+    }
+    cocos2d::CCIMEKeyboardNotificationInfo notiInfo;
+    notiInfo.begin = cocos2d::CCRect(begin.origin.x,
+                                     begin.origin.y,
+                                     begin.size.width, 
+                                     begin.size.height);
+    notiInfo.end = cocos2d::CCRect(end.origin.x,
+                                   end.origin.y,
+                                   end.size.width, 
+                                   end.size.height);
+    notiInfo.duration = (float)aniDuration;
+    cocos2d::CCIMEDispatcher* dispatcher = cocos2d::CCIMEDispatcher::sharedDispatcher();
+    if (UIKeyboardWillShowNotification == type) 
+    {
+        dispatcher->dispatchKeyboardWillShow(notiInfo);
+    }
+    else if (UIKeyboardDidShowNotification == type)
+    {
+		CGSize screenSize = self.window.screen.bounds.size;
+        dispatcher->dispatchKeyboardDidShow(notiInfo);
+        caretRect_ = end;
+        caretRect_.origin.y = viewSize.height - (caretRect_.origin.y + caretRect_.size.height + [UIFont smallSystemFontSize]);
+        caretRect_.size.height = 0;
+    }
+    else if (UIKeyboardWillHideNotification == type)
+    {
+        dispatcher->dispatchKeyboardWillHide(notiInfo);
+    }
+    else if (UIKeyboardDidHideNotification == type)
+    {
+        caretRect_ = CGRectZero;
+        dispatcher->dispatchKeyboardDidHide(notiInfo);
+    }
+}
 @end

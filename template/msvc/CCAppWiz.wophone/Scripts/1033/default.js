@@ -182,7 +182,7 @@ function AddConfigurations(proj, strProjectName) {
         var strOutputFile = '$(OutDir)/' + wizard.FindSymbol("PROJECT_NAME") + '.dll';
         
         if (wizard.FindSymbol('CC_USE_BOX2D')) {
-            strCurIncludeDir += ';..\\;..\\Box2D';
+            strCurIncludeDir += ';..\\';
             strDependLibs += ' libBox2d.lib';
         }
         if (wizard.FindSymbol('CC_USE_CHIPMUNK')) {
@@ -264,7 +264,7 @@ function AddConfigurations(proj, strProjectName) {
 
             var PostBuildTool = config.Tools("VCPostBuildEventTool");
             PostBuildTool.Description = "Performing registration...";
-            var strResDir = "..\\..\\NEWPLUS\\TG3\\APP\\";
+            var strResDir = "..\\..\\NEWPLUS\\TG3\\ConstData\\";
             var strPostCmd = "mkdir " + strResDir;
             strPostCmd += "\r\nxcopy /E /Y .\\Resource\\*.* " + strResDir;
             PostBuildTool.CommandLine = strPostCmd;

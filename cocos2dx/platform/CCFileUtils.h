@@ -93,6 +93,12 @@ public:
     */
     static CCDictionary<std::string, CCObject*> *dictionaryWithContentsOfFile(const char *pFileName);
 
+	/**
+	@brief   Get the writeable path
+	@return  The path that can write/read file
+	*/
+	static std::string getWriteablePath();
+
     /**
     @brief Set/Get whether pop-up a message box when the image load failed
     */
@@ -103,11 +109,10 @@ public:
     // interfaces on wophone
     ///////////////////////////////////////////////////
     /**
-    @brief  Set the ResourcePath and(or) the zip file name
-    @param pszResPath  The absolute resource path
+    @brief  Set the resource zip file name
     @param pszZipFileName The relative path of the .zip file
     */
-    static void setResource(const char* pszZipFileName, const char* pszResPath = NULL);
+    static void setResource(const char* pszZipFileName);
 
     ///////////////////////////////////////////////////
     // interfaces on android

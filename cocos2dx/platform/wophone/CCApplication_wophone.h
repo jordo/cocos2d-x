@@ -77,13 +77,25 @@ public:
 
     /**
     @brief Get the data path of the Application.
-    @return If the app is installed,the return value is the path of .so file.
-    else the return value is "/NEWPLUS/TG3/APP/"
+    @return If the app is installed,the return value is the "Const" path of the application,
+    else the return value is "/NEWPLUS/TG3/ConstData/"
     */
     const char* getAppDataPath();
 
+    /**
+    @brief Get the writable path for the Application.
+    @return If the app is installed,the return value is the "Data" path of the application.
+    else the return value is "/NEWPLUS/TG3/TDA_DATA/Data/Data/"
+    */
+    const char* getAppWritablePath();
 
     void switchNotify(int nTurnOn);
+
+    /**
+    @brief	Wophone hasn't support window rotate orientation with EGL, so use orientation table instead.
+    */
+    static void  setDesignOrientation(UInt32 uOrientation);
+    static UInt32 getDesignOrientation();
 
 protected:
     bool isInBackground();
@@ -97,9 +109,13 @@ protected:
     bool        m_bRunning;
     bool        m_bNeedStop;
     bool        m_bInBackground;
+    bool        m_bEnterBackgroundCalled;
     char        m_AppDataPath[EOS_FILE_MAX_PATH];
+    char        m_AppWritablePath[EOS_FILE_MAX_PATH];
 
-    static CCApplication * sm_pSharedApplication;
+    static CCApplication *  sm_pSharedApplication;
+    static UInt32           sm_uDesignOrientation;
+    static const Orientation * const sm_OrientationTable[];
 };
 
 NS_CC_END;

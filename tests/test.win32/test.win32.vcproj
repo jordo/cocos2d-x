@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx&quot;;&quot;$(SolutionDir)cocos2dx\include&quot;;&quot;$(SolutionDir)&quot;;&quot;$(SolutionDir)chipmunk\include\chipmunk&quot;;&quot;$(SolutionDir)CocosDenshion\include&quot;;..\tests;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\;.\"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)cocos2dx\platform\third_party\win32&quot;;&quot;$(SolutionDir)cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx&quot;;&quot;$(SolutionDir)cocos2dx\include&quot;;&quot;$(SolutionDir)&quot;;&quot;$(SolutionDir)chipmunk\include\chipmunk&quot;;&quot;$(SolutionDir)CocosDenshion\include&quot;;..\tests;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\;.\"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USE_MATH_DEFINES;GL_GLEXT_PROTOTYPES"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcocos2d.lib libgles_cm.lib libBox2d.lib libchipmunk.lib"
+				AdditionalDependencies="libcocos2d.lib libgles_cm.lib libBox2d.lib libchipmunk.lib libcurl_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -90,7 +90,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy_res.bat &quot;$(OutDir)&quot;"
+				CommandLine=""
 			/>
 		</Configuration>
 		<Configuration
@@ -120,7 +120,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx&quot;;&quot;$(SolutionDir)cocos2dx\include&quot;;&quot;$(SolutionDir)&quot;;&quot;$(SolutionDir)chipmunk\include\chipmunk&quot;;&quot;$(SolutionDir)CocosDenshion\include&quot;;..\tests;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\;.\"
+				AdditionalIncludeDirectories="&quot;$(SolutionDir)cocos2dx\platform\third_party\win32&quot;;&quot;$(SolutionDir)cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx&quot;;&quot;$(SolutionDir)cocos2dx\include&quot;;&quot;$(SolutionDir)&quot;;&quot;$(SolutionDir)chipmunk\include\chipmunk&quot;;&quot;$(SolutionDir)CocosDenshion\include&quot;;..\tests;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\;.\"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USE_MATH_DEFINES;GL_GLEXT_PROTOTYPES"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -140,7 +140,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcocos2d.lib libgles_cm.lib libBox2d.lib libchipmunk.lib"
+				AdditionalDependencies="libcocos2d.lib libgles_cm.lib libBox2d.lib libchipmunk.lib libcurl_imp.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="&quot;$(OutDir)&quot;"
@@ -170,7 +170,7 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
-				CommandLine="copy_res.bat &quot;$(OutDir)&quot;"
+				CommandLine=""
 			/>
 		</Configuration>
 	</Configurations>
@@ -603,6 +603,10 @@
 						>
 					</File>
 					<File
+						RelativePath="..\tests\ChipmunkTest\Tank.cpp"
+						>
+					</File>
+					<File
 						RelativePath="..\tests\ChipmunkTest\TheoJansen.cpp"
 						>
 					</File>
@@ -920,6 +924,42 @@
 					</File>
 					<File
 						RelativePath="..\tests\ZwoptexTest\ZwoptexTest.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="CurlTest"
+					>
+					<File
+						RelativePath="..\tests\CurlTest\CurlTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\tests\CurlTest\CurlTest.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="TextInputTest"
+					>
+					<File
+						RelativePath="..\tests\TextInputTest\TextInputTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\tests\TextInputTest\TextInputTest.h"
+						>
+					</File>
+				</Filter>
+				<Filter
+					Name="UserDefaultTest"
+					>
+					<File
+						RelativePath="..\tests\UserDefaultTest\UserDefaultTest.cpp"
+						>
+					</File>
+					<File
+						RelativePath="..\tests\UserDefaultTest\UserDefaultTest.h"
 						>
 					</File>
 				</Filter>

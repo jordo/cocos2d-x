@@ -41,8 +41,7 @@ THE SOFTWARE.
 #include "CCProtocols.h"
 #include "CCNode.h"
 #include "CCDirector.h"
-// #include "CCTouchDispatcher.h"
-// #include "CCTouchDelegateProtocol.h"
+#include "CCUserDefault.h"
 #include "CCActionInstant.h"
 #include "CCActionInterval.h"
 #include "CCActionEase.h"
@@ -83,6 +82,11 @@ THE SOFTWARE.
 #include "CCTouchDispatcher.h"
 #include "CCDrawingPrimitives.h"
 #include "CCScheduler.h"
+
+// havn't implement on wophone and airplay
+#if (CC_TARGET_PLATFORM != CC_PLATFORM_AIRPLAY)
+#include "CCTextFieldTTF.h"
+#endif
 
 //
 // cocoa includes

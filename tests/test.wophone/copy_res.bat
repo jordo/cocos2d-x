@@ -1,2 +1,2 @@
-mkdir ..\..\..\NEWPLUS\TG3\APP
-xcopy /E /Y ..\Res\*.* ..\..\..\NEWPLUS\TG3\APP\
+mkdir ..\..\..\NEWPLUS\TG3\ConstData
+xcopy /E /Y ..\Res\*.* ..\..\..\NEWPLUS\TG3\ConstData

@@ -1,14 +1,13 @@
+// #define COCOS2D_DEBUG   1
+
 #include "CCApplication_wophone.h"
 
 #include "ssBackLightControl.h"
-#include "ssKeyLockControl.h"
+//#include "ssKeyLockControl.h"
 
 #include "CCScheduler.h"
 
 NS_CC_BEGIN;
-
-// sharedApplication pointer
-CCApplication * CCApplication::sm_pSharedApplication = 0;
 
 static const Int32 CC_ON_APPLICATION_IDLE = (EVENT_FirstUser + EVENT_LastUser) / 2;
 
@@ -29,9 +28,10 @@ static long long getTimeOfDayMicroSecond()
 #endif
 
 CCApplication::CCApplication()
-: m_bRunning(FALSE)
-, m_bNeedStop(FALSE)
-, m_bInBackground(FALSE)
+: m_bRunning(false)
+, m_bNeedStop(false)
+, m_bInBackground(false)
+, m_bEnterBackgroundCalled(false)
 {
     memset(&m_tMsg, 0, sizeof(m_tMsg));
     SS_GetCurrentGTID(&m_tMsg.gtid);
@@ -48,9 +48,26 @@ CCApplication::CCApplication()
         Int32  nRet = SS_AppRequest_GetAppName(AppID, &nCmdType);
         CC_BREAK_IF(nRet < 0);
 
+#ifndef _TRANZDA_VM_
+        char *pszDriver = "";
+#else
+        char *pszDriver = "D:/Work7";
+#endif
+
         TUChar AppPath[EOS_FILE_MAX_PATH] = {0};
-        SS_GetApplicationPath(AppID, SS_APP_PATH_TYPE_EXECUTABLE, AppPath);
-        TUString::StrUnicodeToStrUtf8((Char*) m_AppDataPath, AppPath);
+        char   DataPath[EOS_FILE_MAX_PATH] = {0};
+
+        // get the const data path of the application and record it
+        SS_GetApplicationPath(AppID, SS_APP_PATH_TYPE_CONST, AppPath);
+        TUString::StrUnicodeToStrUtf8((Char*) DataPath, AppPath);
+        strcpy(m_AppDataPath, pszDriver);
+        strcat(m_AppDataPath, DataPath);
+
+        // get the writable data path of the application and record it
+        SS_GetApplicationPath(AppID, SS_APP_PATH_TYPE_DATA, AppPath);
+        TUString::StrUnicodeToStrUtf8((Char*) DataPath, AppPath);
+        strcpy(m_AppWritablePath, pszDriver);
+        strcat(m_AppWritablePath, DataPath);
     } while (0);
 
     CC_ASSERT(! sm_pSharedApplication);
@@ -92,9 +109,14 @@ Boolean  CCApplication::EventHandler(EventType*  pEvent)
     case EVENT_AppActiveNotify:
         if (pEvent->sParam1 == 0)
         {
+            CCLOG("EVENT_AppActiveNotify false");
             if (!m_bInBackground)
             {
-                applicationDidEnterBackground();
+                if (! m_bEnterBackgroundCalled)
+                {
+                    applicationDidEnterBackground();
+                    m_bEnterBackgroundCalled = true;
+                }
                 m_bInBackground = true;
             }
 
@@ -102,24 +124,36 @@ Boolean  CCApplication::EventHandler(EventType*  pEvent)
             {
                 StopMainLoop();
             }
-            CfgTurnOnBackLight();
-            EnableKeyLock();
+
+            // restore back light open mode
+            if (CfgGetBackLightStatus())
+            {
+                CfgTurnOnBackLightEx(SYS_BACK_LIGHT_MODE_TIME_LONG);
+                CCLOG("AppActiveNotify::TurnOnBackLight:MODE_TIME_LONG");
+            }
         }
         else if (pEvent->sParam1 > 0)
         {
+            CCLOG("EVENT_AppActiveNotify true");
             if (m_bInBackground)
             {
-                applicationWillEnterForeground();
+                if (m_bEnterBackgroundCalled)
+                {
+                    applicationWillEnterForeground();
+                    m_bEnterBackgroundCalled = false;
+                }
                 m_bInBackground = false;
             }
 
             StartMainLoop();
 
-            CfgTurnOnBackLightDelay(0x7fffffff);
-            // if KeyLock disactived, disable it.
-            if (! CfgKeyLock_GetActive())
+            // modify back light open mode
+            if (CfgGetBackLightStatus())
             {
-                DisableKeyLock();
+                // Why doesn't use CfgTurnOnBackLightEx(SYS_BACK_LIGHT_MODE_TIME_ALWAYS)?
+                // MODE_TIME_ALWAYS cause phone can't sleep when power button pressed.
+                CfgTurnOnBackLightDelay(0x7fffffff);
+                CCLOG("AppActiveNotify::TurnOnBackLight:0x7fffffff");
             }
         }
         break;
@@ -145,7 +179,7 @@ void CCApplication::setAnimationInterval(double interval)
 
 CCApplication::Orientation CCApplication::setOrientation(CCApplication::Orientation orientation)
 {
-    return orientation;
+    return sm_OrientationTable[sm_uDesignOrientation][orientation];
 }
 
 void CCApplication::statusBarFrame(CCRect * rect)
@@ -157,9 +191,16 @@ const char* CCApplication::getAppDataPath()
     return m_AppDataPath;
 }
 
+const char* CCApplication::getAppWritablePath()
+{
+    return m_AppWritablePath;
+}
+
 void CCApplication::switchNotify(int nTurnOn)
 {
     bool bInBack = isInBackground();
+
+    // set the auto close screen and auto key lock status
 
     do 
     {
@@ -168,14 +209,26 @@ void CCApplication::switchNotify(int nTurnOn)
 
         if (! nTurnOn)  // turn off screen
         {
-            // CCDirector::sharedDirector()->pause();
-            applicationDidEnterBackground();
+            if (! m_bEnterBackgroundCalled)
+            {
+                applicationDidEnterBackground();
+                m_bEnterBackgroundCalled = true;
+            }
             StopMainLoop();
         }
         else
         {
-            // CCDirector::sharedDirector()->resume();
-            applicationWillEnterForeground();
+            // modify back light open mode
+            // Why doesn't use CfgTurnOnBackLightEx(SYS_BACK_LIGHT_MODE_TIME_ALWAYS)?
+            // MODE_TIME_ALWAYS cause phone can't sleep when power button pressed.
+            CfgTurnOnBackLightDelay(0x7fffffff);
+            CCLOG("AppActiveNotify::TurnOnBackLight:0x7fffffff");
+
+            if (m_bEnterBackgroundCalled)
+            {
+                applicationWillEnterForeground();
+                m_bEnterBackgroundCalled = false;
+            }
             StartMainLoop();
         }
     } while (0);
@@ -188,13 +241,13 @@ bool CCApplication::isInBackground()
 
 void CCApplication::StartMainLoop()
 {
+    m_bNeedStop = FALSE;
     if (m_bRunning)
     {
-        m_bNeedStop = FALSE;
         return;
     }
+    CCLOG("Post StartMainLoop");
     Sys_PostMessage2(MESSAGE_PRIOR_LOWEST, &m_tMsg);
-    m_bRunning = TRUE;
 }
 
 void CCApplication::StopMainLoop()
@@ -206,15 +259,17 @@ Int32 CCApplication::_OnAppIdle(MESSAGE_t * pMsg, UInt32 uData)
 {
     CCApplication& rThis = (CCApplication&) CCApplication::sharedApplication();
     CCEGLView *     pView = CCDirector::sharedDirector()->getOpenGLView();
-    if (pView && rThis.m_bRunning)
+    if (pView)
     {
         if (rThis.m_bNeedStop)
         {
+            CCLOG("_OnAppIdle: Stop");
             rThis.m_bNeedStop = FALSE;
             rThis.m_bRunning  = FALSE;
         }
         else
         {
+            rThis.m_bRunning  = TRUE;
 #ifdef _TRANZDA_VM_
             LARGE_INTEGER nNow;
             QueryPerformanceCounter(&nNow);
@@ -233,7 +288,7 @@ Int32 CCApplication::_OnAppIdle(MESSAGE_t * pMsg, UInt32 uData)
 #endif
             else
             {
-                Sys_Sleep(0);
+                Sys_SchedYield();
             }
             Sys_PostMessage2(MESSAGE_PRIOR_LOWEST, &rThis.m_tMsg);
         }
@@ -244,10 +299,67 @@ Int32 CCApplication::_OnAppIdle(MESSAGE_t * pMsg, UInt32 uData)
 //////////////////////////////////////////////////////////////////////////
 // static member function
 //////////////////////////////////////////////////////////////////////////
+
+// shared application
+CCApplication * CCApplication::sm_pSharedApplication = 0;
+
 CCApplication& CCApplication::sharedApplication()
 {
     CC_ASSERT(sm_pSharedApplication);
     return *sm_pSharedApplication;
+}
+
+// rotate device support
+static const CCApplication::Orientation s_OrientationModeNormal[] = 
+{
+    CCApplication::kOrientationPortrait,
+    CCApplication::kOrientationPortraitUpsideDown,
+    CCApplication::kOrientationLandscapeLeft,
+    CCApplication::kOrientationLandscapeRight,
+};
+
+static const CCApplication::Orientation s_OrientationModeCW[] = 
+{
+    CCApplication::kOrientationLandscapeLeft,
+    CCApplication::kOrientationLandscapeRight,
+    CCApplication::kOrientationPortraitUpsideDown,
+    CCApplication::kOrientationPortrait,
+};
+
+static const CCApplication::Orientation s_OrientationModeUD[] = 
+{
+    CCApplication::kOrientationPortraitUpsideDown,
+    CCApplication::kOrientationPortrait,
+    CCApplication::kOrientationLandscapeRight,
+    CCApplication::kOrientationLandscapeLeft,
+};
+
+static const CCApplication::Orientation s_OrientationModeCCW[] = 
+{
+    CCApplication::kOrientationLandscapeRight,
+    CCApplication::kOrientationLandscapeLeft,
+    CCApplication::kOrientationPortrait,
+    CCApplication::kOrientationPortraitUpsideDown,
+};
+
+const CCApplication::Orientation * const CCApplication::sm_OrientationTable[] = 
+{
+    s_OrientationModeNormal,
+    s_OrientationModeCW,
+    s_OrientationModeUD,
+    s_OrientationModeCCW,
+};
+
+UInt32 CCApplication::sm_uDesignOrientation = WM_WINDOW_ROTATE_MODE_NORMAL;
+
+void  CCApplication::setDesignOrientation(UInt32 uOrientation)
+{
+    sm_uDesignOrientation = uOrientation;
+}
+
+UInt32 CCApplication::getDesignOrientation()
+{
+    return sm_uDesignOrientation;
 }
 
 NS_CC_END;

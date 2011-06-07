@@ -49,6 +49,7 @@ namespace cocos2d {
 			m_sString = str->m_sString;
 		}
 		virtual ~CCString(){ m_sString.clear(); }
+		
 		int toInt()
 		{
 			return atoi(m_sString.c_str());
@@ -60,6 +61,10 @@ namespace cocos2d {
 		float toFloat()
 		{
 			return (float)atof(m_sString.c_str());
+		}
+		std::string toStdString()
+		{
+			return m_sString;
 		}
 
 		bool isEmpty()

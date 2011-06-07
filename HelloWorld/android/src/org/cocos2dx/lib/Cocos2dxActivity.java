@@ -64,6 +64,7 @@ public class Cocos2dxActivity extends Activity{
     private static boolean accelerometerEnabled = false;
     private static Handler handler;
     private final static int HANDLER_SHOW_DIALOG = 1;
+    private static String packageName;
 
     private static native void nativeSetPaths(String apkPath);
 
@@ -171,6 +172,10 @@ public class Cocos2dxActivity extends Activity{
     	backgroundMusicPlayer.end();
     	soundPlayer.end();
     }
+    
+    public static String getCocos2dxPackageName(){
+    	return packageName;
+    }
 
     @Override
     protected void onResume() {
@@ -194,7 +199,9 @@ public class Cocos2dxActivity extends Activity{
     	pauseBackgroundMusic();
     }
 
-    protected void setPackgeName(String packageName) {
+    protected void setPackageName(String packageName) {
+    	Cocos2dxActivity.packageName = packageName;
+    	
     	String apkFilePath = "";
         ApplicationInfo appInfo = null;
         PackageManager packMgmr = getApplication().getPackageManager();

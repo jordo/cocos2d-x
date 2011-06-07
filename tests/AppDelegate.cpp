@@ -2,8 +2,10 @@
 
 #include "cocos2d.h"
 #include "tests/controller.h"
+#include "SimpleAudioEngine.h"
 
 USING_NS_CC;
+using namespace CocosDenshion;
 
 AppDelegate::AppDelegate()
 {
@@ -12,6 +14,7 @@ AppDelegate::AppDelegate()
 
 AppDelegate::~AppDelegate()
 {
+    SimpleAudioEngine::end();
 }
 
 bool AppDelegate::initInstance()
@@ -25,7 +28,7 @@ bool AppDelegate::initInstance()
         // The tests is designed as HVGA.
         CCEGLView * pMainWnd = new CCEGLView();
         CC_BREAK_IF(! pMainWnd
-            || ! pMainWnd->Create(TEXT("cocos2d: tests"), 320, 480));
+            || ! pMainWnd->Create(TEXT("cocos2d: tests"), 480, 320));
 
 #endif  // CC_PLATFORM_WIN32
 
@@ -46,13 +49,18 @@ bool AppDelegate::initInstance()
         // Initialize OpenGLView instance, that release by CCDirector when application terminate.
         // The tests is designed as HVGA.
         CCEGLView* pMainWnd = new CCEGLView(this);
-        CC_BREAK_IF(! pMainWnd || ! pMainWnd->Create(320,480));
+        CC_BREAK_IF(! pMainWnd || ! pMainWnd->Create(320 ,480, WM_WINDOW_ROTATE_MODE_CW));
 
 #ifndef _TRANZDA_VM_  
-        // on wophone emulator, we copy resources files to Work7/TG3/APP/ folder instead of zip file
+        // on wophone emulator, we copy resources files to Work7/NEWPLUS/TDA_DATA/Data folder instead of zip file
         cocos2d::CCFileUtils::setResource("TestCocos2dx.zip");
+        CocosDenshion::SimpleAudioEngine::setResource("TestCocos2dx.zip");
 #endif
 
+#endif
+	
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_AIRPLAY)
+		CCDirector::sharedDirector()->setDeviceOrientation(CCDeviceOrientationLandscapeLeft);
 #endif
 
         bRet = true;
@@ -69,8 +77,9 @@ bool AppDelegate::applicationDidFinishLaunching()
     // enable High Resource Mode(2x, such as iphone4) and maintains low resource on other devices.
     // pDirector->enableRetinaDisplay(true);
 
-    // sets landscape mode
-    pDirector->setDeviceOrientation(kCCDeviceOrientationLandscapeLeft);
+    // sets opengl landscape mode
+    // tests set device orientation in RootViewController.mm
+    // pDirector->setDeviceOrientation(kCCDeviceOrientationLandscapeLeft);
 
 	// turn on display FPS
     pDirector->setDisplayFPS(true);
@@ -92,10 +101,12 @@ bool AppDelegate::applicationDidFinishLaunching()
 void AppDelegate::applicationDidEnterBackground()
 {
     CCDirector::sharedDirector()->pause();
+    SimpleAudioEngine::sharedEngine()->pauseBackgroundMusic();   
 }
 
 // this function will be called when the app is active again
 void AppDelegate::applicationWillEnterForeground()
 {
     CCDirector::sharedDirector()->resume();
+    SimpleAudioEngine::sharedEngine()->resumeBackgroundMusic();   
 }

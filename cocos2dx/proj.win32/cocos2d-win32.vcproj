@@ -42,7 +42,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\iconv&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\zlib&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libpng&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libjpeg&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libxml2&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\include;.."
+				AdditionalIncludeDirectories="..\platform;..\platform\third_party\win32\iconv;..\platform\third_party\win32\zlib;..\platform\third_party\win32\libpng;..\platform\third_party\win32\libjpeg;..\platform\third_party\win32\libxml2;..\platform\third_party\win32\OGLES;..\include;.."
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;COCOS2DXWIN32_EXPORTS;GL_GLEXT_PROTOTYPES"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -124,7 +124,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;$(SolutionDir)\cocos2dx\platform&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\iconv&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\zlib&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libpng&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libjpeg&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\libxml2&quot;;&quot;$(SolutionDir)cocos2dx\platform\third_party\win32\OGLES&quot;;..\include;.."
+				AdditionalIncludeDirectories="..\platform;..\platform\third_party\win32\iconv;..\platform\third_party\win32\zlib;..\platform\third_party\win32\libpng;..\platform\third_party\win32\libjpeg;..\platform\third_party\win32\libxml2;..\platform\third_party\win32\OGLES;..\include;.."
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;COCOS2DXWIN32_EXPORTS;GL_GLEXT_PROTOTYPES"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
@@ -191,6 +191,10 @@
 				RelativePath="..\base_nodes\CCAtlasNode.cpp"
 				>
 			</File>
+			<File
+				RelativePath="..\base_nodes\CCNode.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="cocoa"
@@ -241,6 +245,10 @@
 			</File>
 			<File
 				RelativePath="..\effects\CCGrabber.h"
+				>
+			</File>
+			<File
+				RelativePath="..\effects\CCGrid.cpp"
 				>
 			</File>
 			<File
@@ -368,6 +376,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\CCArray.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\CCAtlasNode.h"
 				>
 			</File>
@@ -400,14 +412,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\CCEvent.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\CCEventDispatcher.h"
-				>
-			</File>
-			<File
 				RelativePath="..\include\CCGeometry.h"
 				>
 			</File>
@@ -416,7 +420,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\include\CCKeyboardEventDelegate.h"
+				RelativePath="..\include\CCIMEDelegate.h"
+				>
+			</File>
+			<File
+				RelativePath="..\include\CCIMEDispatcher.h"
 				>
 			</File>
 			<File
@@ -457,10 +465,6 @@
 			</File>
 			<File
 				RelativePath="..\include\CCMotionStreak.h"
-				>
-			</File>
-			<File
-				RelativePath="..\include\CCMouseEventDelegate.h"
 				>
 			</File>
 			<File
@@ -560,6 +564,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\CCTextFieldTTF.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\CCTexture2D.h"
 				>
 			</File>
@@ -620,6 +628,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\include\CCUserDefault.h"
+				>
+			</File>
+			<File
 				RelativePath="..\include\CCZone.h"
 				>
 			</File>
@@ -652,7 +664,15 @@
 			Name="layers_scenes_transitions_nodes"
 			>
 			<File
+				RelativePath="..\layers_scenes_transitions_nodes\CCLayer.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\layers_scenes_transitions_nodes\CCScene.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\layers_scenes_transitions_nodes\CCTransition.cpp"
 				>
 			</File>
 			<File
@@ -667,6 +687,10 @@
 		<Filter
 			Name="menu_nodes"
 			>
+			<File
+				RelativePath="..\menu_nodes\CCMenu.cpp"
+				>
+			</File>
 			<File
 				RelativePath="..\menu_nodes\CCMenuItem.cpp"
 				>
@@ -704,6 +728,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\particle_nodes\CCParticleSystemPoint.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\particle_nodes\CCParticleSystemQuad.cpp"
 				>
 			</File>
@@ -732,10 +760,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\platform\CCDirector_mobile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\platform\CCEGLView_platform.h"
 				>
 			</File>
@@ -756,10 +780,6 @@
 				>
 			</File>
 			<File
-				RelativePath="..\platform\CCGrid_mobile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\platform\CCImage.cpp"
 				>
 			</File>
@@ -768,31 +788,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\platform\CCLayer_mobile.cpp"
-				>
-			</File>
-			<File
 				RelativePath="..\platform\CCLibxml2.h"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCMenu_mobile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCNode_mobile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCParticleSystemPoint_mobile.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCParticleSystemPoint_mobile.h"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCParticleSystemPoint_platform.h"
 				>
 			</File>
 			<File
@@ -825,10 +821,6 @@
 			</File>
 			<File
 				RelativePath="..\platform\CCThread.h"
-				>
-			</File>
-			<File
-				RelativePath="..\platform\CCTransition_mobile.cpp"
 				>
 			</File>
 			<File
@@ -908,6 +900,10 @@
 				>
 			</File>
 			<File
+				RelativePath="..\support\CCArray.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\support\CCPointExtension.cpp"
 				>
 			</File>
@@ -917,6 +913,10 @@
 			</File>
 			<File
 				RelativePath="..\support\CCProfiling.h"
+				>
+			</File>
+			<File
+				RelativePath="..\support\CCUserDefault.cpp"
 				>
 			</File>
 			<File
@@ -1069,18 +1069,14 @@
 			</File>
 		</Filter>
 		<Filter
-			Name="event_dispatcher"
+			Name="text_input_node"
 			>
 			<File
-				RelativePath="..\event_dispatcher\CCEventDispatcher.cpp"
+				RelativePath="..\text_input_node\CCIMEDispatcher.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\event_dispatcher\CCKeyboardEventDelegate.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\event_dispatcher\CCMouseEventDelegate.cpp"
+				RelativePath="..\text_input_node\CCTextFieldTTF.cpp"
 				>
 			</File>
 		</Filter>
@@ -1094,6 +1090,10 @@
 		</File>
 		<File
 			RelativePath="..\CCConfiguration.h"
+			>
+		</File>
+		<File
+			RelativePath="..\CCDirector.cpp"
 			>
 		</File>
 		<File

@@ -64,15 +64,44 @@ public class Cocos2dxRenderer implements GLSurfaceView.Renderer {
     	nativeKeyDown(keyCode);
     }
     
+    public void handleOnPause(){
+    	nativeOnPause();
+    }
+    
+    public void handleOnResume(){
+    	nativeOnResume();
+    }
+    
     public static void setAnimationInterval(double interval){
     	animationInterval = (long)(interval * NANOSECONDSPERSECOND);
     }
-    
     private static native void nativeTouchesBegin(int id, float x, float y);
     private static native void nativeTouchesEnd(int id, float x, float y);
     private static native void nativeTouchesMove(int[] id, float[] x, float[] y);
     private static native void nativeTouchesCancel(int[] id, float[] x, float[] y);
-private static native boolean nativeKeyDown(int keyCode);
+    private static native boolean nativeKeyDown(int keyCode);
     private static native void nativeRender();
     private static native void nativeInit(int w, int h);
+    private static native void nativeOnPause();
+    private static native void nativeOnResume();
+    
+    /////////////////////////////////////////////////////////////////////////////////
+    // handle input method edit message
+    /////////////////////////////////////////////////////////////////////////////////
+    
+    public void handleInsertText(final String text) {
+    	nativeInsertText(text);
+    }
+    
+    public void handleDeleteBackward() {
+    	nativeDeleteBackward();
+    }
+
+	public String getContentText() {
+		return nativeGetContentText();
+	}
+	
+    private static native void nativeInsertText(String text);
+    private static native void nativeDeleteBackward();
+    private static native String nativeGetContentText();
 }

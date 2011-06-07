@@ -25,6 +25,7 @@ THE SOFTWARE.
 NS_CC_BEGIN;
 
 #include "CCCommon.h"
+#include "Cocos2dJni.h"
 
 #define  MAX_PATH 256
 
@@ -122,7 +123,7 @@ unsigned char* CCFileUtils::getFileData(const char* pszFileName, const char* psz
     return pData;
 }
 
-void CCFileUtils::setResource(const char* pszZipFileName, const char* pszResPath)
+void CCFileUtils::setResource(const char* pszZipFileName)
 {
     CCAssert(0, "Have not implement!");
 }
@@ -131,6 +132,27 @@ int CCFileUtils::ccLoadFileIntoMemory(const char *filename, unsigned char **out)
 {
     CCAssert(0, "Have not implement!");
     return 0;
+}
+
+string CCFileUtils::getWriteablePath()
+{
+	// the path is: /data/data/ + package name
+	string dir("/data/data/");
+	char* tmp = getPackageNameJNI();
+
+	if (tmp)
+	{
+		dir.append(tmp).append("/");
+
+		// release memory
+		delete [] tmp;
+
+		return dir;
+	}
+	else
+	{
+		return "";
+	}
 }
 
 NS_CC_END;

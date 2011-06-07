@@ -52,9 +52,6 @@
     <Filter Include="support\zip_support">
       <UniqueIdentifier>{3e1780b2-6a4d-48f0-90ca-e4e0d2613978}</UniqueIdentifier>
     </Filter>
-    <Filter Include="support\file_support">
-      <UniqueIdentifier>{e1d45f64-9be7-41c5-a657-194780e1b9ea}</UniqueIdentifier>
-    </Filter>
     <Filter Include="textures">
       <UniqueIdentifier>{022561bf-a9f5-4d03-b3d3-5178fe3ed572}</UniqueIdentifier>
     </Filter>
@@ -67,8 +64,8 @@
     <Filter Include="keypad_dispatcher">
       <UniqueIdentifier>{b7e6a4ee-f78a-4399-8f56-526294bf8580}</UniqueIdentifier>
     </Filter>
-    <Filter Include="event_dispatcher">
-      <UniqueIdentifier>{1b2d8814-d294-4657-be38-4f6d904ad475}</UniqueIdentifier>
+    <Filter Include="test_input_node">
+      <UniqueIdentifier>{2bb0e4ec-d798-44ec-bc81-c7f7bfc90391}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -177,37 +174,16 @@
     <ClCompile Include="..\platform\CCCommon.cpp">
       <Filter>platform</Filter>
     </ClCompile>
-    <ClCompile Include="..\platform\CCDirector_mobile.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="..\platform\CCGL.cpp">
       <Filter>platform</Filter>
     </ClCompile>
-    <ClCompile Include="..\platform\CCGrid_mobile.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
     <ClCompile Include="..\platform\CCImage.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\CCLayer_mobile.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\CCMenu_mobile.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\CCNode_mobile.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\CCParticleSystemPoint_mobile.cpp">
       <Filter>platform</Filter>
     </ClCompile>
     <ClCompile Include="..\platform\CCStdC.cpp">
       <Filter>platform</Filter>
     </ClCompile>
     <ClCompile Include="..\platform\CCThread.cpp">
-      <Filter>platform</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\CCTransition_mobile.cpp">
       <Filter>platform</Filter>
     </ClCompile>
     <ClCompile Include="..\platform\platform.cpp">
@@ -217,12 +193,6 @@
       <Filter>platform\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\platform\win32\CCEGLView_win32.cpp">
-      <Filter>platform\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\win32\CCFileUtils_win32.cpp">
-      <Filter>platform\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="..\platform\win32\CCNS_win32.cpp">
       <Filter>platform\win32</Filter>
     </ClCompile>
     <ClCompile Include="..\sprite_nodes\CCAnimation.cpp">
@@ -273,9 +243,6 @@
     <ClCompile Include="..\support\zip_support\ZipUtils.cpp">
       <Filter>support\zip_support</Filter>
     </ClCompile>
-    <ClCompile Include="..\support\file_support\FileUtils.cpp">
-      <Filter>support\file_support</Filter>
-    </ClCompile>
     <ClCompile Include="..\textures\CCPVRTexture.cpp">
       <Filter>textures</Filter>
     </ClCompile>
@@ -318,15 +285,6 @@
     <ClCompile Include="..\keypad_dispatcher\CCKeypadDispatcher.cpp">
       <Filter>keypad_dispatcher</Filter>
     </ClCompile>
-    <ClCompile Include="..\event_dispatcher\CCEventDispatcher.cpp">
-      <Filter>event_dispatcher</Filter>
-    </ClCompile>
-    <ClCompile Include="..\event_dispatcher\CCKeyboardEventDelegate.cpp">
-      <Filter>event_dispatcher</Filter>
-    </ClCompile>
-    <ClCompile Include="..\event_dispatcher\CCMouseEventDelegate.cpp">
-      <Filter>event_dispatcher</Filter>
-    </ClCompile>
     <ClCompile Include="..\CCConfiguration.cpp" />
     <ClCompile Include="..\CCDrawingPrimitives.cpp" />
     <ClCompile Include="..\CCScheduler.cpp" />
@@ -334,6 +292,43 @@
     <ClCompile Include="..\CCCamera.cpp" />
     <ClCompile Include="..\platform\CCSAXParser.cpp">
       <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\platform\CCFileUtils.cpp">
+      <Filter>platform</Filter>
+    </ClCompile>
+    <ClCompile Include="..\cocoa\CCNS.cpp">
+      <Filter>cocoa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text_input_node\CCIMEDispatcher.cpp">
+      <Filter>test_input_node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\text_input_node\CCTextFieldTTF.cpp">
+      <Filter>test_input_node</Filter>
+    </ClCompile>
+    <ClCompile Include="..\base_nodes\CCNode.cpp">
+      <Filter>base_nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\CCDirector.cpp" />
+    <ClCompile Include="..\layers_scenes_transitions_nodes\CCLayer.cpp">
+      <Filter>layers_scenes_transitions_nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\layers_scenes_transitions_nodes\CCTransition.cpp">
+      <Filter>layers_scenes_transitions_nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\particle_nodes\CCParticleSystemPoint.cpp">
+      <Filter>particle_nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\support\CCArray.cpp">
+      <Filter>support</Filter>
+    </ClCompile>
+    <ClCompile Include="..\effects\CCGrid.cpp">
+      <Filter>effects</Filter>
+    </ClCompile>
+    <ClCompile Include="..\menu_nodes\CCMenu.cpp">
+      <Filter>menu_nodes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\support\CCUserDefault.cpp">
+      <Filter>support</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -628,12 +623,6 @@
     <ClInclude Include="..\platform\CCNS.h">
       <Filter>platform</Filter>
     </ClInclude>
-    <ClInclude Include="..\platform\CCParticleSystemPoint_mobile.h">
-      <Filter>platform</Filter>
-    </ClInclude>
-    <ClInclude Include="..\platform\CCParticleSystemPoint_platform.h">
-      <Filter>platform</Filter>
-    </ClInclude>
     <ClInclude Include="..\platform\CCPlatformConfig.h">
       <Filter>platform</Filter>
     </ClInclude>
@@ -656,9 +645,6 @@
       <Filter>platform\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\platform\win32\CCEGLView_win32.h">
-      <Filter>platform\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="..\platform\win32\CCFileUtils_win32.h">
       <Filter>platform\win32</Filter>
     </ClInclude>
     <ClInclude Include="..\support\base64.h">
@@ -694,15 +680,30 @@
     <ClInclude Include="..\support\zip_support\ZipUtils.h">
       <Filter>support\zip_support</Filter>
     </ClInclude>
-    <ClInclude Include="..\support\file_support\FileData.h">
-      <Filter>support\file_support</Filter>
-    </ClInclude>
     <ClInclude Include="..\touch_dispatcher\CCTouchHandler.h">
       <Filter>touch_dispatcher</Filter>
     </ClInclude>
     <ClInclude Include="..\CCConfiguration.h" />
     <ClInclude Include="..\platform\CCSAXParser.h">
       <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\platform\CCFileUtils.h">
+      <Filter>platform</Filter>
+    </ClInclude>
+    <ClInclude Include="..\cocoa\CCNS.h">
+      <Filter>cocoa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CCTextFieldTTF.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CCIMEDelegate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CCIMEDispatcher.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\CCUserDefault.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

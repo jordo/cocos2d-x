@@ -32,6 +32,7 @@ THE SOFTWARE.
 #include "CCDirector.h"
 #include "CCTouch.h"
 #include "CCTouchDispatcher.h"
+#include "CCIMEDispatcher.h"
 
 NS_CC_BEGIN;
 
@@ -276,7 +277,7 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONDOWN:
 		if (m_pDelegate && m_pTouch && MK_LBUTTON == wParam)
 		{
-            POINT pt = {LOWORD(lParam), HIWORD(lParam)};
+            POINT pt = {(short)LOWORD(lParam), (short)HIWORD(lParam)};
             if (PtInRect(&m_rcViewPort, pt))
             {
                 m_bCaptured = true;
@@ -292,8 +293,8 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_MOUSEMOVE:
 		if (MK_LBUTTON == wParam && m_bCaptured)
 		{
-            m_pTouch->SetTouchInfo(0, (float)(LOWORD(lParam)- m_rcViewPort.left) / m_fScreenScaleFactor,
-                (float)(HIWORD(lParam) - m_rcViewPort.top) / m_fScreenScaleFactor);
+            m_pTouch->SetTouchInfo(0, (float)((short)LOWORD(lParam)- m_rcViewPort.left) / m_fScreenScaleFactor,
+                (float)((short)HIWORD(lParam) - m_rcViewPort.top) / m_fScreenScaleFactor);
             m_pDelegate->touchesMoved(m_pSet, NULL);
 		}
 		break;
@@ -301,14 +302,50 @@ LRESULT CCEGLView::WindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	case WM_LBUTTONUP:
 		if (m_bCaptured)
 		{
-			m_pTouch->SetTouchInfo(0, (float)(LOWORD(lParam)- m_rcViewPort.left) / m_fScreenScaleFactor,
-                (float)(HIWORD(lParam) - m_rcViewPort.top) / m_fScreenScaleFactor);
+			m_pTouch->SetTouchInfo(0, (float)((short)LOWORD(lParam)- m_rcViewPort.left) / m_fScreenScaleFactor,
+                (float)((short)HIWORD(lParam) - m_rcViewPort.top) / m_fScreenScaleFactor);
 			m_pDelegate->touchesEnded(m_pSet, NULL);
 			m_pSet->removeObject(m_pTouch);
             ReleaseCapture();
 			m_bCaptured = false;
 		}
 		break;
+
+    case WM_CHAR:
+        {
+            if (wParam < 0x20)
+            {
+                if (VK_BACK == wParam)
+                {
+                    CCIMEDispatcher::sharedDispatcher()->dispatchDeleteBackward();
+                }
+                else if (VK_RETURN == wParam)
+                {
+                    CCIMEDispatcher::sharedDispatcher()->dispatchInsertText("\n", 1);
+                }
+                else if (VK_TAB == wParam)
+                {
+                    // tab input
+                }
+                else if (VK_ESCAPE == wParam)
+                {
+                    // ESC input
+                }
+            }
+            else if (wParam < 128)
+            {
+                // ascii char
+                CCIMEDispatcher::sharedDispatcher()->dispatchInsertText((const char *)&wParam, 1);
+            }
+            else
+            {
+                char szUtf8[8] = {0};
+                int nLen = WideCharToMultiByte(CP_UTF8, 0, (LPCWSTR)&wParam, 1, szUtf8, sizeof(szUtf8), NULL, NULL);
+
+                CCIMEDispatcher::sharedDispatcher()->dispatchInsertText(szUtf8, nLen);
+            }
+        }
+        break;
 
 	case WM_PAINT:
 		BeginPaint(m_hWnd, &ps);
@@ -405,6 +442,10 @@ void CCEGLView::setViewPortInPoints(float x, float y, float w, float h)
             (GLint)(w * factor),
             (GLint)(h * factor));
     }
+}
+
+void CCEGLView::setIMEKeyboardState(bool /*bOpen*/)
+{
 }
 
 HWND CCEGLView::getHWnd()

@@ -43,7 +43,7 @@ public:
 	/**
 	 * the width and height is the real size of phone
 	 */
-    void    setFrameWitdAndHeight(int width, int height);
+    void    setFrameWidthAndHeight(int width, int height);
 	/**
 	 * create a drawing rect, 
 	 * the width and heiht is the resource size match best
@@ -60,6 +60,7 @@ public:
 	void    setViewPortInPoints(float x, float y, float w, float h);
 	CCRect  getViewPort();
 	float   getScreenScaleFactor();
+    void    setIMEKeyboardState(bool bOpen);
 
 	// static function
 	/**

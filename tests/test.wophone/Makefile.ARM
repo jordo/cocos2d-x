@@ -21,9 +21,10 @@ INCLUDE_PATH += -I../ -I../Res \
                 -I../../chipmunk/include/chipmunk \
                 -I../../CocosDenshion/include \
                 -I../../ \
-                -I../tests
+                -I../tests \
+                -I$(TO_PROJECT_ROOT)/Include/ThirdParty
 
-LIBS += -lCocos2dStatic -lCocosDenshionStatic -lTSoundPlayer -lChipmunkStatic -lBox2dStatic -lTG3_GLESv1_CM -lTG3_EGL -lz -lxml2 -lpng14 -lImageToolKit -ljpeg
+LIBS += -lCocos2dStatic -lCocosDenshionStatic -lTSoundPlayer -lChipmunkStatic -lBox2dStatic -lTG3_GLESv1_CM -lTG3_EGL -lz -lxml2 -lpng14 -lImageToolKit -ljpeg -lcurl
 
 OBJECTS_DIR = ./Debug-ARM
 DESTDIR = $(TO_PROJECT_ROOT)/$(BIN_OUTPUT_DIR)
@@ -66,12 +67,14 @@ OBJECTS = \
 	$(OBJECTS_DIR)/Sensors.o \
 	$(OBJECTS_DIR)/Simple.o \
 	$(OBJECTS_DIR)/Springies.o \
+	$(OBJECTS_DIR)/Tank.o \
 	$(OBJECTS_DIR)/TheoJansen.o \
 	$(OBJECTS_DIR)/Tumble.o \
 	$(OBJECTS_DIR)/UnsafeOps.o \
 	$(OBJECTS_DIR)/ClickAndMoveTest.o \
 	$(OBJECTS_DIR)/CocosDenshionTest.o \
 	$(OBJECTS_DIR)/CocosNodeTest.o \
+	$(OBJECTS_DIR)/CurlTest.o \
 	$(OBJECTS_DIR)/DrawPrimitivesTest.o \
 	$(OBJECTS_DIR)/EaseActionsTest.o \
 	$(OBJECTS_DIR)/EffectsAdvancedTest.o \
@@ -97,11 +100,13 @@ OBJECTS = \
 	$(OBJECTS_DIR)/SceneTest.o \
 	$(OBJECTS_DIR)/SchedulerTest.o \
 	$(OBJECTS_DIR)/SpriteTest.o \
+	$(OBJECTS_DIR)/TextInputTest.o \
 	$(OBJECTS_DIR)/TileMapTest.o \
 	$(OBJECTS_DIR)/Ball.o \
 	$(OBJECTS_DIR)/Paddle.o \
 	$(OBJECTS_DIR)/TouchesTest.o \
 	$(OBJECTS_DIR)/TransitionsTest.o \
+	$(OBJECTS_DIR)/UserDefaultTest.o \
 	$(OBJECTS_DIR)/ZwoptexTest.o
 
 ADD_OBJECTS += 
@@ -214,6 +219,9 @@ $(OBJECTS_DIR)/Simple.o : ../tests/ChipmunkTest/Simple.cpp
 $(OBJECTS_DIR)/Springies.o : ../tests/ChipmunkTest/Springies.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/Springies.o ../tests/ChipmunkTest/Springies.cpp
 
+$(OBJECTS_DIR)/Tank.o : ../tests/ChipmunkTest/Tank.cpp
+	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/Tank.o ../tests/ChipmunkTest/Tank.cpp
+
 $(OBJECTS_DIR)/TheoJansen.o : ../tests/ChipmunkTest/TheoJansen.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/TheoJansen.o ../tests/ChipmunkTest/TheoJansen.cpp
 
@@ -231,6 +239,9 @@ $(OBJECTS_DIR)/CocosDenshionTest.o : ../tests/CocosDenshionTest/CocosDenshionTes
 
 $(OBJECTS_DIR)/CocosNodeTest.o : ../tests/CocosNodeTest/CocosNodeTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/CocosNodeTest.o ../tests/CocosNodeTest/CocosNodeTest.cpp
+
+$(OBJECTS_DIR)/CurlTest.o : ../tests/CurlTest/CurlTest.cpp
+	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/CurlTest.o ../tests/CurlTest/CurlTest.cpp
 
 $(OBJECTS_DIR)/DrawPrimitivesTest.o : ../tests/DrawPrimitivesTest/DrawPrimitivesTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/DrawPrimitivesTest.o ../tests/DrawPrimitivesTest/DrawPrimitivesTest.cpp
@@ -307,6 +318,9 @@ $(OBJECTS_DIR)/SchedulerTest.o : ../tests/SchedulerTest/SchedulerTest.cpp
 $(OBJECTS_DIR)/SpriteTest.o : ../tests/SpriteTest/SpriteTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/SpriteTest.o ../tests/SpriteTest/SpriteTest.cpp
 
+$(OBJECTS_DIR)/TextInputTest.o : ../tests/TextInputTest/TextInputTest.cpp
+	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/TextInputTest.o ../tests/TextInputTest/TextInputTest.cpp
+
 $(OBJECTS_DIR)/TileMapTest.o : ../tests/TileMapTest/TileMapTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/TileMapTest.o ../tests/TileMapTest/TileMapTest.cpp
 
@@ -321,6 +335,9 @@ $(OBJECTS_DIR)/TouchesTest.o : ../tests/TouchesTest/TouchesTest.cpp
 
 $(OBJECTS_DIR)/TransitionsTest.o : ../tests/TransitionsTest/TransitionsTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/TransitionsTest.o ../tests/TransitionsTest/TransitionsTest.cpp
+
+$(OBJECTS_DIR)/UserDefaultTest.o : ../tests/UserDefaultTest/UserDefaultTest.cpp
+	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/UserDefaultTest.o ../tests/UserDefaultTest/UserDefaultTest.cpp
 
 $(OBJECTS_DIR)/ZwoptexTest.o : ../tests/ZwoptexTest/ZwoptexTest.cpp
 	$(CXX) -c $(CXX_FLAGS) $(INCLUDE_PATH) $(LAST_INCLUDE_PATH) -o $(OBJECTS_DIR)/ZwoptexTest.o ../tests/ZwoptexTest/ZwoptexTest.cpp
