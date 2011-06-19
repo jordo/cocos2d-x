@@ -118,7 +118,7 @@ static voidpf ZCALLBACK fopen64_file_func (voidpf opaque, const void* filename, 
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_AIRPLAY)
 		file = NULL;
 #else
-	    file = fopen64((const char*)filename, mode_fopen);	
+	    file = fopen((const char*)filename, mode_fopen);	
 #endif
     }
 
@@ -154,7 +154,7 @@ static ZPOS64_T ZCALLBACK ftell64_file_func (voidpf opaque, voidpf stream)
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_AIRPLAY)
     ret = NULL;
 #else
-    ret = ftello64((FILE *)stream);
+    ret = ftello((FILE *)stream);
 #endif
     return ret;
 }
@@ -204,7 +204,7 @@ static long ZCALLBACK fseek64_file_func (voidpf  opaque, voidpf stream, ZPOS64_T
 #if (CC_TARGET_PLATFORM == CC_PLATFORM_AIRPLAY)
 	ret = -1;
 #else
-    if(fseeko64((FILE *)stream, offset, fseek_origin) != 0)
+    if(fseeko((FILE *)stream, offset, fseek_origin) != 0)
 		ret = -1;
 #endif
     return ret;
