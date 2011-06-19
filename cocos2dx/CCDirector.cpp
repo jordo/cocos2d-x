@@ -188,6 +188,12 @@ void CCDirector::drawScene(void)
 	//tick before glClear: issue #533
 	if (! m_bPaused)
 	{
+#ifdef  ENABLE_LUA
+		if (m_luatick.size())
+		{
+			schedule_SCHEDULE(NULL, NULL, m_fDeltaTime, m_luatick);
+		}
+#endif
 		CCScheduler::sharedScheduler()->tick(m_fDeltaTime);
 	}
 
@@ -479,6 +485,7 @@ CCSize CCDirector::getDisplaySizeInPixels(void)
 
 void CCDirector::reshapeProjection(CCSize newWindowSize)
 {
+    CC_UNUSED_PARAM(newWindowSize);
     m_obWinSizeInPoints = m_pobOpenGLView->getSize();
 	m_obWinSizeInPixels = CCSizeMake(m_obWinSizeInPoints.width * m_fContentScaleFactor,
 		                             m_obWinSizeInPoints.height * m_fContentScaleFactor);
@@ -748,6 +755,7 @@ tPixelFormat CCDirector::getPiexFormat(void)
 
 bool CCDirector::setDirectorType(ccDirectorType obDirectorType)
 {
+    CC_UNUSED_PARAM(obDirectorType);
 	// we only support CCDisplayLinkDirector
 	CCDirector::sharedDirector();
 
@@ -881,6 +889,20 @@ void CCDirector::setDeviceOrientation(ccDeviceOrientation kDeviceOrientation)
         setProjection(m_eProjection);
     }
 }
+
+
+#ifdef  ENABLE_LUA
+void CCDirector::registerTick(const char* szfn)
+{
+	if (szfn == NULL || strlen(szfn) == 0)
+	{
+		CCLOG("error registerTick");
+		return ;
+	}
+	m_luatick = szfn;
+}
+#endif
+
 
 /***************************************************
 * implementation of DisplayLinkDirector

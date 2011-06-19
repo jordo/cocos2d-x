@@ -58,7 +58,7 @@ public:
 	virtual void destroy(void);
 	virtual void keep(void);
 	
-    virtual void didAccelerate(CCAcceleration* pAccelerationValue) {}
+    virtual void didAccelerate(CCAcceleration* pAccelerationValue) {CC_UNUSED_PARAM(pAccelerationValue);}
     virtual void AccelerometerDestroy(void);
     virtual void AccelerometerKeep(void);
 
@@ -225,6 +225,12 @@ public:
 
 	/** creates a CCMultiplexLayer with one or more layers using a variable argument list. */
 	static CCMultiplexLayer * layerWithLayers(CCLayer* layer, ... );
+
+#ifdef  ENABLE_LUA
+	static CCMultiplexLayer * layerWithLayer(CCLayer* layer);
+	void addLayer(CCLayer* layer);
+	bool initWithLayer(CCLayer* layer);
+#endif
 	/** initializes a MultiplexLayer with one or more layers using a variable argument list. */
 	bool initWithLayers(CCLayer* layer, va_list params);
 	/** switches to a certain layer indexed by n. 

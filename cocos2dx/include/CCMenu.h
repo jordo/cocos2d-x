@@ -57,7 +57,9 @@ namespace cocos2d{
 		virtual ~CCMenu(){}
 		/** creates a CCMenu with it's items */
 		static CCMenu* menuWithItems(CCMenuItem* item, ...);
-
+#ifdef  ENABLE_LUA
+		static CCMenu*menuWithItem(CCMenuItem* item);
+#endif
 		/** initializes a CCMenu with it's items */
 		bool initWithItems(CCMenuItem* item, va_list args);
 
@@ -117,8 +119,8 @@ namespace cocos2d{
 
 	protected:
 		tCCMenuState m_eState;
-		CCMenuItem *m_pSelectedItem;
-		GLubyte m_cOpacity;
+        GLubyte m_cOpacity;
+		CCMenuItem *m_pSelectedItem;		
 		ccColor3B m_tColor;
 	};
 }

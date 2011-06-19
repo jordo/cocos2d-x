@@ -124,9 +124,9 @@ public: inline void set##funName(varType var){ CC_SAFE_RETAIN(var); CC_SAFE_RELE
 
 // cocos2d debug
 #if !defined(COCOS2D_DEBUG) || COCOS2D_DEBUG == 0
-#define CCLOG(...)              do {} while (0)
-#define CCLOGINFO(...)          do {} while (0)
-#define CCLOGERROR(...)         do {} while (0)
+#define CCLOG(...)              
+#define CCLOGINFO(...)         
+#define CCLOGERROR(...)         
 
 #elif COCOS2D_DEBUG == 1
 #define CCLOG(format, ...)      cocos2d::CCLog(format, ##__VA_ARGS__)
@@ -145,6 +145,9 @@ public: inline void set##funName(varType var){ CC_SAFE_RETAIN(var); CC_SAFE_RELE
 // assertion
 #include <assert.h>
 #define CC_ASSERT(cond)                assert(cond)
+#define CC_UNUSED_PARAM(unusedparam)   unusedparam
+
+
 
 // platform depended macros
 

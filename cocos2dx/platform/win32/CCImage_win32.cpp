@@ -47,6 +47,12 @@ public:
         {
             DeleteDC(m_hDC);
         }
+        HFONT hDefFont = (HFONT)GetStockObject(DEFAULT_GUI_FONT);
+        if (hDefFont != m_hFont)
+        {
+            DeleteObject(m_hFont);
+            m_hFont = hDefFont;
+        }
     }
 
     bool setFont(const char * pFontName = NULL, int nSize = 0)
@@ -235,8 +241,7 @@ public:
             // draw text
             HGDIOBJ hOldFont = SelectObject(m_hDC, m_hFont);
             HGDIOBJ hOldBmp  = SelectObject(m_hDC, m_hBmp);
-
-            RECT rc = {0, 0, tSize.cx, tSize.cy};
+            
             SetBkMode(m_hDC, TRANSPARENT);
             SetTextColor(m_hDC, RGB(255, 255, 255)); // white color
 
@@ -282,8 +287,7 @@ bool CCImage::initWithString(
     unsigned char * pImageData = 0;
     do 
     {
-        CC_BREAK_IF(! pText);
-        int nLen = strlen(pText);
+        CC_BREAK_IF(! pText);       
 
         BitmapDC& dc = sharedBitmapDC();
 
