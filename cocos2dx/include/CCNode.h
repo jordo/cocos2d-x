@@ -149,6 +149,7 @@ namespace   cocos2d {
 
 		/**  Sets the minimun (smallest supported scale factor) resolution scale factor. */
 		static void setMinResIndScale(CGFloat minScale);
+		static CGFloat getMinResIndScale();
 
 		/** Sets the maximum (largest supported scale factor) resolution scale factor. */
 		static void setMaxResIndScale(CGFloat maxScale);

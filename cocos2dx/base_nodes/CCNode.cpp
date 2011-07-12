@@ -221,6 +221,10 @@ void CCNode::setMinResIndScale(CGFloat minScale)
 	scaleResIndMin = minScale;
 }
 
+CGFloat CCNode::getMinResIndScale() {
+	return scaleResIndMin;
+}
+
 void CCNode::setMaxResIndScale(CGFloat maxScale)
 {
 	scaleResIndMax = maxScale;
