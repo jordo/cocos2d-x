@@ -515,6 +515,10 @@ namespace cocos2d{
 			// Color MUST be set before opacity, since opacity might change color if OpacityModifyRGB is on
 			fontChar->setColor(m_tColor);
 
+			// Font chars shouldn't be scaled dynamically...
+			fontChar->setScaleMode(kCCNodeScaleNone);
+			fontChar->setScale(1.0f);
+
 			// only apply opaccity if it is different than 255 )
 			// to prevent modifying the color too (issue #610)
 			if( m_cOpacity != 255 )
