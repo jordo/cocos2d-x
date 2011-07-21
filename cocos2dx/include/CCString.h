@@ -71,6 +71,30 @@ namespace cocos2d {
 		{
 			return m_sString.empty();
 		}
+
+		const char* cStr()
+		{
+			return m_sString.c_str();
+		}
+
+		static CCString* stringWithFormat(const char* format, ...)
+		{
+			int bufSize = 1024;
+			char buffer[bufSize];
+
+			va_list args;
+			va_start(args, format);
+			int length = vsnprintf(buffer, bufSize, format, args);
+			va_end(args);
+
+			if (length >= bufSize) {
+				// Hmm...not sure what to do.
+			}
+
+			CCString* str = new CCString(buffer);
+			str->autorelease();
+			return str;
+		}
 	};
 }// namespace cocos2d
 #endif //__CCSTRING_H__
